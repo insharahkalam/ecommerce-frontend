@@ -1,19 +1,63 @@
 import { useState } from "react";
-import {
-    Logo,
-    SocialButton,
-    GoogleIcon,
-    FacebookIcon,
-    EyeIcon,
-    Field,
-    inputClass,
-} from "../components/Shared";
+import toast from "react-hot-toast";
+import { Logo, SocialButton, GoogleIcon, FacebookIcon, EyeIcon, Field, inputClass } from "../components/Shared";
 import signupImg from '../assets/signup.jpg'
+import api from "../config/axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
-    const [role, setRole] = useState("buyer");
     const [showPass, setShowPass] = useState(false);
-    const [agree, setAgree] = useState(true);
+    const [username, setUserName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate()
+
+    const handleSignup = async (e) => {
+        e.preventDefault()
+
+        if (!username || !email || !password) {
+            toast.error("Please fill all the fields");
+            return;
+        }
+
+        if (password.length < 6) {
+            toast.error("Password must be at least 6 characters");
+            return;
+        }
+
+        const formData = new FormData()
+        formData.append('username', username)
+        formData.append('email', email)
+        formData.append('password', password)
+
+        try {
+            setLoading(true);
+            const res = await api.post('/authentication/register', formData)
+            toast.success(res?.data?.message || "Account created successfully!");
+
+            setUserName('')
+            setEmail('')
+            setPassword('')
+
+            setTimeout(() => {
+                navigate('/login')
+            }, 2000);
+
+        } catch (error) {
+            console.error("Signup error:", error);
+
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Something went wrong. Please try again.";
+
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
@@ -39,51 +83,19 @@ export default function Signup() {
                         </a>
                     </p>
 
-                    {/* Role toggle */}
-                    <div className="grid grid-cols-2 gap-3 mt-5">
-                        <button
-                            type="button"
-                            onClick={() => setRole("buyer")}
-                            className={`py-2.5 rounded-lg text-sm font-medium border transition-colors ${role === "buyer"
-                                ? "bg-orange-500 border-orange-500 text-black"
-                                : "border-neutral-700 text-neutral-300 hover:bg-neutral-900"
-                                }`}
-                        >
-                            Buyer
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setRole("seller")}
-                            className={`py-2.5 rounded-lg text-sm font-medium border transition-colors ${role === "seller"
-                                ? "bg-orange-500 border-orange-500 text-black"
-                                : "border-neutral-700 text-neutral-300 hover:bg-neutral-900"
-                                }`}
-                        >
-                            Seller
-                        </button>
-                    </div>
-
                     <form className="mt-5 flex flex-col gap-4">
-                        <div className="grid grid-cols-2 gap-3">
-                            <Field label="First Name">
-                                <input type="text" placeholder="Ali" className={inputClass} />
-                            </Field>
-                            <Field label="Last Name">
-                                <input type="text" placeholder="Khan" className={inputClass} />
-                            </Field>
-                        </div>
 
-                        <Field label="Phone Number">
-                            <input type="tel" placeholder="ex: +92 3XX XXXXXXX" className={inputClass} />
+                        <Field label="Username">
+                            <input onChange={(e) => setUserName(e.target.value)} value={username} type="text" placeholder="John Doe" className={inputClass} />
                         </Field>
 
                         <Field label="Email address">
-                            <input type="email" placeholder="you@example.com" className={inputClass} />
+                            <input onChange={(e) => setEmail(e.target.value)} value={email} type="email" placeholder="you@example.com" className={inputClass} />
                         </Field>
 
                         <Field label="Password">
                             <div className="relative">
-                                <input
+                                <input onChange={(e) => setPassword(e.target.value)} value={password}
                                     type={showPass ? "text" : "password"}
                                     placeholder="Min. 8 characters"
                                     className={inputClass + " pr-10"}
@@ -98,30 +110,12 @@ export default function Signup() {
                             </div>
                         </Field>
 
-                        <label className="flex items-start gap-2 text-xs text-neutral-400">
-                            <input
-                                type="checkbox"
-                                checked={agree}
-                                onChange={(e) => setAgree(e.target.checked)}
-                                className="mt-0.5 accent-orange-500"
-                            />
-                            <span>
-                                I agree to the{" "}
-                                <a href="#" className="text-orange-500 hover:underline">
-                                    Terms of Service
-                                </a>{" "}
-                                and{" "}
-                                <a href="#" className="text-orange-500 hover:underline">
-                                    Privacy Policy
-                                </a>
-                            </span>
-                        </label>
-
-                        <button
-                            type="submit"
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold rounded-lg py-2.5 flex items-center justify-center gap-2 transition-colors"
+                        <button onClick={handleSignup}
+                            type="button"
+                            disabled={loading}
+                            className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed text-black font-semibold rounded-lg py-2.5 flex items-center justify-center gap-2 transition-colors"
                         >
-                            Create Account <span>&rarr;</span>
+                            {loading ? "Creating..." : "Create Account"} <span>&rarr;</span>
                         </button>
                     </form>
 
@@ -131,9 +125,8 @@ export default function Signup() {
                         <div className="h-px bg-neutral-800 flex-1" />
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex">
                         <SocialButton icon={<GoogleIcon />} label="Google" />
-                        <SocialButton icon={<FacebookIcon />} label="Facebook" />
                     </div>
                 </div>
             </div>

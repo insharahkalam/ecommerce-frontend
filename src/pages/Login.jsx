@@ -35,7 +35,7 @@ export default function Login() {
                     <h1 className="text-white text-2xl font-semibold mt-6">Welcome back</h1>
                     <p className="text-sm text-neutral-400 mt-1">
                         Don't have an account?{" "}
-                        <a href="/signup" className="text-orange-500 hover:underline">
+                        <a href="/" className="text-orange-500 hover:underline">
                             Sign up
                         </a>
                     </p>
