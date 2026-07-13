@@ -5,7 +5,8 @@ const url = import.meta.env.VITE_MODE === 'deployment'
 
 const api = axios.create({
     baseURL: url,
-    headers: { "Content-Type": 'application/json' }
+    headers: { "Content-Type": 'application/json' },
+    withCredentials: true
 })
 
 export default api

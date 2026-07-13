@@ -4,7 +4,7 @@ export function Logo() {
             <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold text-sm">
                 !
             </div>
-            <span className="text-white font-semibold text-lg">Apna Bazar</span>
+            <span className="text-white  font-serif font-semibold text-xl">Apna Bazar</span>
         </div>
     );
 }
