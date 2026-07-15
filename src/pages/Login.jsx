@@ -74,7 +74,7 @@ export default function Login() {
                             </Link>
                         </p>
 
-                        <form onSubmit={handleLogin} className="mt-7 space-y-4">
+                        <form onSubmit={handleLogin} className="mt-7 font-serif space-y-4">
                             <Field label="Email">
                                 <input
                                     value={email}

@@ -65,4 +65,4 @@ export function Field({ label, children }) {
 }
 
 export const inputClass =
-    "w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-500 outline-none focus:border-orange-500 transition-colors";
+    "w-full font-serif bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-500 outline-none focus:border-orange-500 transition-colors";

@@ -102,10 +102,10 @@ export default function ResetPass() {
                                         />
                                     </svg>
                                 </div>
-                                <h1 className="font-display text-white text-2xl font-semibold mt-5 tracking-tight">
+                                <h1 className="font-serif text-white text-2xl font-semibold mt-5 tracking-tight">
                                     Password reset!
                                 </h1>
-                                <p className="text-sm text-neutral-400 mt-2 leading-relaxed">
+                                <p className="text-sm font-serif text-neutral-400 mt-2 leading-relaxed">
                                     Your password has been updated successfully.
                                     <br />
                                     Redirecting you to login…
@@ -118,10 +118,10 @@ export default function ResetPass() {
                         ) : (
                             <>
                                 <div className="mt-8 text-center">
-                                    <h1 className="font-display text-white text-2xl md:text-3xl font-semibold tracking-tight">
+                                    <h1 className="font-serif italic text-white text-2xl md:text-3xl font-semibold tracking-tight">
                                         Reset your password
                                     </h1>
-                                    <p className="text-sm text-neutral-400 mt-2 leading-relaxed">
+                                    <p className="text-sm text-neutral-400 mt-4 leading-relaxed">
                                         Choose a strong new password to secure your account.
                                     </p>
                                 </div>
@@ -143,7 +143,7 @@ export default function ResetPass() {
                                     </div>
                                 )}
 
-                                <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
+                                <form onSubmit={handleSubmit} className="mt-6 font-serif flex flex-col gap-5">
                                     <Field label="New password">
                                         <div className="relative">
                                             <input

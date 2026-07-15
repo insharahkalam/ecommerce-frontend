@@ -82,10 +82,10 @@ export default function Forgot() {
                         </>
                     ) : (
                         <>
-                            <h1 className="font-display text-2xl sm:text-3xl font-semibold text-center tracking-tight">
+                            <h1 className="font-serif italic text-2xl sm:text-3xl font-semibold text-center tracking-tight">
                                 Forgot password?
                             </h1>
-                            <p className="mt-2 text-sm text-neutral-400 text-center">
+                            <p className="mt-4 text-sm text-neutral-400 text-center">
                                 No worries, we'll send you reset instructions.
                             </p>
 
@@ -95,7 +95,7 @@ export default function Forgot() {
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                            <form onSubmit={handleSubmit} className="mt-6 font-serif space-y-4">
                                 <Field label="Email">
                                     <input
                                         value={email}
