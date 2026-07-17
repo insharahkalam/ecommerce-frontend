@@ -7,6 +7,10 @@ import AdminDashboard from '../pages/Admin/AdminDashboard';
 import Forgot from '../pages/Forgot';
 import ResetPass from '../pages/ResetPass';
 import ProductsPage from '../pages/ProductsPage';
+import Order from '../pages/Admin/Order';
+import Customers from '../pages/Admin/Customers';
+import AddProduct from '../pages/Admin/AddProduct';
+import Setting from '../pages/Admin/Setting';
 
 
 const Routing = () => {
@@ -15,6 +19,10 @@ const Routing = () => {
             <BrowserRouter>
                 <Routes>
                     <Route path='/adminDashboard' element={<AdminDashboard />} />
+                    <Route path='/orders' element={<Order />} />
+                    <Route path='/customers' element={<Customers />} />
+                    <Route path='/add-product' element={<AddProduct />} />
+                    <Route path='/setting' element={<Setting />} />
 
                     <Route path='/' element={<Signup />} />
                     <Route path='/login' element={<Login />} />
