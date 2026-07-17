@@ -1,10 +1,14 @@
 import React, { useState, useMemo } from "react";
-import { MoreHorizontal, Filter, Check, Trash2 } from "lucide-react";
-import { GlassCard, Pill, SearchInput } from "../components/ui.jsx";
-import { statusStyle } from "../utils/styles.js";
-import { ORDER_STATUSES } from "../data.js";
+import { useOutletContext } from "react-router-dom";
+import { Filter, MoreHorizontal, Check, Trash2 } from "lucide-react";
+import GlassCard from "../../components/GlassCard";
+import Pill from "../../components/Pill";
+import SearchInput from "../../components/SearchInput";
+import { statusStyle } from "../../utils/badgeStyles";
+import { ORDER_STATUSES } from "../../data/mockData";
 
-export default function Order({ orders, setOrders }) {
+export default function Order() {
+  const { orders, setOrders } = useOutletContext();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [openMenuId, setOpenMenuId] = useState(null);

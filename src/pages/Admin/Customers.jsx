@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { Plus, Mail, Phone, Trash2 } from "lucide-react";
-import { GlassCard, SearchInput, PrimaryButton, Modal, FieldLabel, TextField } from "../components/ui.jsx";
+import { useOutletContext } from "react-router-dom";
+import { Mail, Phone, Trash2, Plus } from "lucide-react";
+import GlassCard from "../../components/GlassCard";
+import SearchInput from "../../components/SearchInput";
+import PrimaryButton from "../../components/PrimaryButton";
+import Modal from "../../components/Modal";
+import { FieldLabel, TextField } from "../../components/FormFields";
 
-export default function Customer({ customers, setCustomers }) {
+export default function Customers() {
+  const { customers, setCustomers } = useOutletContext();
   const [query, setQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
