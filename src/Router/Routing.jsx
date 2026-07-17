@@ -14,10 +14,10 @@ const Routing = () => {
         <>
             <BrowserRouter>
                 <Routes>
+                    <Route path='/adminDashboard' element={<AdminDashboard />} />
+
                     <Route path='/' element={<Signup />} />
                     <Route path='/login' element={<Login />} />
-                    {/* <Route path='/home' element={<Home />} /> */}
-                    <Route path='/admin' element={<AdminDashboard />} />
                     <Route path='/forgot' element={<Forgot />} />
                     <Route path='/reset-password/:token' element={<ResetPass />} />
                     <Route path='/home' element={<ProductsPage />} />

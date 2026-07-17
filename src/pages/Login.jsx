@@ -28,7 +28,7 @@ export default function Login() {
             toast.success(res?.data?.message || "Login successfully!");
             setEmail(""); setPassword("");
             setTimeout(() => {
-                navigate(res.data.isAdmin === true ? "/admin" : "/home");
+                navigate(res.data.isAdmin === true ? "/adminDashboard" : "/home");
             }, 1500);
         } catch (error) {
             toast.error(error?.response?.data?.message || error?.message || "Something went wrong.");
