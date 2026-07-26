@@ -1,17 +1,12 @@
 import React, { useState } from "react";
-import { Upload, Star, Tag, Plus, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { Upload, Star, Tag, Plus, Trash2, Loader2, AlertCircle, XCircle } from "lucide-react";
 import Modal from "./Modal";
 import { FieldLabel, TextField, TextArea } from "./FormFields";
 import PrimaryButton from "./PrimaryButton";
 import SecondaryButton from "./SecondaryButton";
 import { API_BASE_URL } from "../data/mockData";
+import api from "../config/axios";
 
-/* ---------------------------------------------------------
-   ADD / EDIT PRODUCT MODAL — wired to the createProduct API
-   Sends multipart/form-data: title, description, price,
-   category, brand, stock, discount, featured, specifications
-   (as a JSON string), and image (file).
-   --------------------------------------------------------- */
 export default function ProductFormModal({ editing, initial, onClose, onSaved }) {
   const [title, setTitle] = useState(initial?.name || "");
   const [description, setDescription] = useState(initial?.description || "");
@@ -29,7 +24,12 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(initial?.image || null);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [toast, setToast] = useState(null); // { message, type: "error" }
+
+  function showToast(message, type = "error") {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 2500);
+  }
 
   function handleImageChange(e) {
     const file = e.target.files?.[0];
@@ -63,10 +63,9 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
     e.preventDefault();
     const validationError = validate();
     if (validationError) {
-      setError(validationError);
+      showToast(validationError);
       return;
     }
-    setError("");
     setSubmitting(true);
 
     try {
@@ -87,18 +86,14 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
       formData.append("specifications", JSON.stringify(specifications));
       if (imageFile) formData.append("image", imageFile);
 
-      const url = editing ? `${API_BASE_URL}/${editing}` : API_BASE_URL;
-      const res = await fetch(url, {
-        method: editing ? "PUT" : "POST",
-        body: formData,
-      });
+      const url = editing
+        ? `${API_BASE_URL}/update-product/${editing}`
+        : `${API_BASE_URL}/createProduct`;
+      const res = editing
+        ? await api.put(url, formData, { headers: { "Content-Type": "multipart/form-data" } })
+        : await api.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
 
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        throw new Error(data.message || "Something went wrong while saving the product.");
-      }
-
+      const data = res.data || {};
       const saved = data.products || data.product || {};
 
       onSaved({
@@ -116,9 +111,7 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
         sold: initial?.sold || 0,
       });
     } catch (err) {
-      // Backend not reachable in this environment — fall back to saving locally
-      // so the UI still reflects the attempted change, but surface the error.
-      setError(err.message || "Could not reach the server. Saved locally instead.");
+      showToast(err.response?.data?.message || err.message || "Could not reach the server. Saved locally instead.");
       onSaved({
         id: editing || `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
         name: title.trim(),
@@ -145,10 +138,12 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
   return (
     <Modal title={editing ? "Edit product" : "Add product"} onClose={onClose} wide>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {error && (
-          <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg border border-red-500/25 bg-red-500/10 text-red-300 text-xs font-serif">
-            <AlertCircle size={14} className="mt-0.5 flex-shrink-0" />
-            <span>{error}</span>
+        {toast && (
+          <div className="fixed top-5 right-5 z-[999]">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg border border-red-500/25 bg-red-500/10 text-red-300 shadow-xl shadow-black/40 text-sm font-serif backdrop-blur-xl">
+              <XCircle size={16} />
+              <span>{toast.message}</span>
+            </div>
           </div>
         )}
 
