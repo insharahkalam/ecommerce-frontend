@@ -1,5 +1,7 @@
 export const API_BASE_URL = "/products";
 
+export const AUTH_BASE_URL = "/authentication";
+
 export const ORDER_STATUSES = ["Pending", "Fulfilled", "Refunded"];
 
 export const revenueData = [

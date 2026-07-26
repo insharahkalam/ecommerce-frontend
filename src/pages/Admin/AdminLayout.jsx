@@ -2,8 +2,20 @@ import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import Topbar from "../../components/Topbar";
-import { API_BASE_URL } from "../../data/mockData";
+import { API_BASE_URL, AUTH_BASE_URL } from "../../data/mockData";
 import api from "../../config/axios";
+
+function normalizeCustomer(u) {
+  return {
+    id: u._id || u.id,
+    name: u.username || u.name || "Unknown",
+    email: u.email || "",
+    phone: u.phone || "",
+    orders: u.orders || 0,
+    spent: u.spent || 0,
+    joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "—",
+  };
+}
 
 function normalizeProduct(p) {
   return {
@@ -28,6 +40,7 @@ export default function AdminLayout() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -60,14 +73,23 @@ export default function AdminLayout() {
       //   errors.push("orders");
       // }
 
-      // try {
-      //   const res = await fetch(CUSTOMERS_API_URL);
-      //   const data = await res.json();
-      //   const list = data.customers || data.data || (Array.isArray(data) ? data : []);
-      //   if (!cancelled) setCustomers(list);
-      // } catch (err) {
-      //   errors.push("customers");
-      // }
+      try {
+        const res = await api.get(`${AUTH_BASE_URL}/ViewAllUsers`);
+        const data = res.data;
+        const list = data.allUsers || [];
+        if (!cancelled) setCustomers(list.map(normalizeCustomer));
+      } catch (err) {
+        console.error("Failed to load users:", err);
+        errors.push("customers");
+      }
+
+      try {
+        const res = await api.get(`${AUTH_BASE_URL}/getMe`);
+        const data = res.data;
+        if (data.user && !cancelled) setAdmin(data.user);
+      } catch (err) {
+        console.error("Failed to load admin:", err);
+      }
 
       if (!cancelled) {
         if (errors.length) setLoadError(`Could not load: ${errors.join(", ")}. Check your backend/API_BASE_URL.`);
@@ -104,7 +126,7 @@ export default function AdminLayout() {
       <Sidebar mobileNavOpen={mobileNavOpen} setMobileNavOpen={setMobileNavOpen} />
 
       <div className="relative flex-1 flex flex-col min-w-0">
-        <Topbar setMobileNavOpen={setMobileNavOpen} />
+        <Topbar setMobileNavOpen={setMobileNavOpen} admin={admin} />
 
         <main className="flex-1 px-5 lg:px-8 py-6 flex flex-col gap-6 overflow-y-auto">
           {loadError && (

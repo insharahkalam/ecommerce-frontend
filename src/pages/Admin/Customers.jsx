@@ -17,21 +17,6 @@ export default function Customers() {
     (c) => c.name.toLowerCase().includes(query.toLowerCase()) || c.email.toLowerCase().includes(query.toLowerCase())
   );
 
-  function addCustomer() {
-    if (!form.name.trim() || !form.email.trim()) return;
-    const id = `CUS-${String(customers.length + 1).padStart(3, "0")}`;
-    setCustomers((prev) => [
-      { id, name: form.name, email: form.email, phone: form.phone, orders: 0, spent: 0, joined: "Jul 2026" },
-      ...prev,
-    ]);
-    setForm({ name: "", email: "", phone: "" });
-    setShowModal(false);
-  }
-
-  function removeCustomer(id) {
-    setCustomers((prev) => prev.filter((c) => c.id !== id));
-  }
-
   return (
     <>
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -39,7 +24,6 @@ export default function Customers() {
           <h1 className="font-display italic text-2xl font-semibold tracking-tight text-white">Customers</h1>
           <p className="text-sm mt-1 text-neutral-400 font-serif">{customers.length} customers</p>
         </div>
-        <PrimaryButton onClick={() => setShowModal(true)}><Plus size={16} /> Add customer</PrimaryButton>
       </div>
 
       <SearchInput value={query} onChange={setQuery} placeholder="Search name or email…" />
@@ -85,11 +69,6 @@ export default function Customers() {
                     <td className="py-3 font-mono text-neutral-300">{c.orders}</td>
                     <td className="py-3 font-mono text-white">${c.spent.toFixed(2)}</td>
                     <td className="py-3 font-mono text-neutral-500">{c.joined}</td>
-                    <td className="py-3 text-right">
-                      <button onClick={() => removeCustomer(c.id)} className="p-1.5 rounded-md hover:bg-white/5 text-neutral-400 hover:text-red-400 transition-colors">
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
