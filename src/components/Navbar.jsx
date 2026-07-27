@@ -27,7 +27,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-50 backdrop-blur-xl bg-neutral-950/70 border-b border-white/10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-2">
+                <Link to="/home" className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                         <ShoppingBag size={16} color="white" />
                     </div>
@@ -36,10 +36,10 @@ export default function Navbar() {
 
                 {/* Desktop nav */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <NavLink to="/" end className={navLink}>Home</NavLink>
+                    <NavLink to="/home" end className={navLink}>Home</NavLink>
                     <NavLink to="/shop" className={navLink}>Shop</NavLink>
-                    <NavLink to="/about" className={navLink}>About</NavLink>
-                    <NavLink to="/contact" className={navLink}>Contact</NavLink>
+                        <NavLink to="/about" className={navLink}>About</NavLink>
+                        <NavLink to="/contact" className={navLink}>Contact</NavLink>
                 </nav>
 
                 {/* Right actions */}
