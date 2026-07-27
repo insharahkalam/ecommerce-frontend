@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import Topbar from "../../components/Topbar";
-import { API_BASE_URL, AUTH_BASE_URL } from "../../data/mockData";
+import { API_BASE_URL, AUTH_BASE_URL, ORDERS_API_URL } from "../../data/mockData";
 import api from "../../config/axios";
 
 function normalizeCustomer(u) {
@@ -31,6 +31,25 @@ function normalizeProduct(p) {
     specifications: p.specifications || {},
     image: p.image || null,
     sold: Number(p.sold) || 0,
+  };
+}
+
+function normalizeOrder(o) {
+  return {
+    id: o._id,
+    customer: o.user?.username || "Unknown",
+    email: o.user?.email || "",
+    items: Array.isArray(o.items) ? o.items.length : 0,
+    rawItems: o.items || [],
+    total: Number(o.totalAmount) || 0,
+    status: o.status || "Pending",
+    paymentMethod: o.paymentMethod || "COD",
+    paymentStatus: o.paymentStatus || "Pending",
+    shippingAddress: o.shippingAddress || {},
+    bankTransferDetails: o.bankTransferDetails || null,
+    date: o.createdAt
+      ? new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      : "—",
   };
 }
 
@@ -64,14 +83,15 @@ export default function AdminLayout() {
         errors.push("products");
       }
 
-      // try {
-      //   const res = await fetch(ORDERS_API_URL);
-      //   const data = await res.json();
-      //   const list = data.orders || data.data || (Array.isArray(data) ? data : []);
-      //   if (!cancelled) setOrders(list);
-      // } catch (err) {
-      //   errors.push("orders");
-      // }
+      try {
+        const res = await api.get(`${ORDERS_API_URL}/getAllOrders`);
+        const data = res.data;
+        const list = data.orders || [];
+        if (!cancelled) setOrders(list.map(normalizeOrder));
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+        errors.push("orders");
+      }
 
       try {
         const res = await api.get(`${AUTH_BASE_URL}/ViewAllUsers`);

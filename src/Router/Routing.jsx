@@ -2,10 +2,9 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Signup from '../pages/Signup';
 import Login from '../pages/Login';
-import Home from '../pages/Home';
+import Home from '../pages/customer/Home';
 import Forgot from '../pages/Forgot';
 import ResetPass from '../pages/ResetPass';
-import ProductsPage from '../pages/ProductsPage';
 
 import AdminLayout from '../pages/Admin/AdminLayout';
 import AdminDashboard from '../pages/Admin/AdminDashboard';
@@ -34,7 +33,7 @@ const Routing = () => {
                     <Route path='/login' element={<Login />} />
                     <Route path='/forgot' element={<Forgot />} />
                     <Route path='/reset-password/:token' element={<ResetPass />} />
-                    <Route path='/home' element={<ProductsPage />} />
+                    <Route path='/home' element={<Home />} />
                 </Routes>
 
             </BrowserRouter>
