@@ -75,6 +75,9 @@ import Order from '../pages/Admin/Order';
 import Customers from '../pages/Admin/Customers';
 import AddProduct from '../pages/Admin/AddProduct';
 import Setting from '../pages/Admin/Setting';
+import Shop from '../pages/customer/Shop';
+import About from '../pages/customer/About';
+import Contact from '../pages/customer/Contact';
 
 const Routing = () => {
     return (
@@ -90,10 +93,19 @@ const Routing = () => {
                             <Route path='/cart' element={<Cart />} />
                             <Route path='/checkout' element={<Checkout />} />
                             <Route path='/my-orders' element={<MyOrders />} />
+                            
+                            <Route path="/shop" element={<Shop />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/contact" element={<Contact />} />
+
+
+
+
+
                         </Route>
 
                         {/* Auth routes — no header/layout needed */}
-                        <Route path='/signup' element={<Signup />} />
+                        <Route path='/' element={<Signup />} />
                         <Route path='/login' element={<Login />} />
                         <Route path='/forgot' element={<Forgot />} />
                         <Route path='/reset-password/:token' element={<ResetPass />} />
