@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useOutletContext } from "react-router-dom";
-import { Filter, MoreHorizontal, Check, Trash2, Eye, X } from "lucide-react";
+import { Filter, MoreHorizontal, Check, Trash2, Eye, X, ImageOff } from "lucide-react";
 import GlassCard from "../../components/GlassCard";
 import Pill from "../../components/Pill";
 import SearchInput from "../../components/SearchInput";
@@ -16,8 +17,13 @@ export default function Order() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const [viewingOrder, setViewingOrder] = useState(null);
+  const [receiptZoom, setReceiptZoom] = useState(false);
   const [toast, setToast] = useState(null);
+
+  const menuRef = useRef(null);
+  const btnRefs = useRef({});
 
   function showToast(message, type = "success") {
     setToast({ message, type });
@@ -33,6 +39,41 @@ export default function Order() {
       return matchesQuery && matchesStatus;
     });
   }, [orders, query, statusFilter]);
+
+  // Menu button ki actual position nikal kar dropdown ko portal me fixed render karte hain,
+  // isse table ke overflow-x-auto wrapper me dropdown clip/overlap nahi hota (wahi wajah thi
+  // jis se badges "upar-neeche" ajeeb tarah se dikh rahe thay).
+  function toggleMenu(id) {
+    if (openMenuId === id) {
+      setOpenMenuId(null);
+      return;
+    }
+    const btn = btnRefs.current[id];
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 6, left: rect.right - 208 }); // 208 = menu width (w-52)
+    }
+    setOpenMenuId(id);
+  }
+
+  // Bahar click / scroll karne par menu band ho jaye
+  useEffect(() => {
+    if (!openMenuId) return;
+    function handleOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target) && !btnRefs.current[openMenuId]?.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    }
+    function handleScroll() {
+      setOpenMenuId(null);
+    }
+    document.addEventListener("mousedown", handleOutside);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [openMenuId]);
 
   async function updateStatus(id, status) {
     const prev = orders;
@@ -106,7 +147,7 @@ export default function Order() {
       <GlassCard>
         <div className="p-5">
           <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm border-separate" style={{ borderSpacing: "0 2px" }}>
               <thead>
                 <tr className="text-left text-neutral-500">
                   <th className="py-2 font-serif text-xs uppercase tracking-wide">Order</th>
@@ -124,59 +165,33 @@ export default function Order() {
                   const s = statusStyle(o.status);
                   const ps = paymentStatusStyle(o.paymentStatus);
                   return (
-                    <tr key={o.id} className="border-t border-white/10 relative">
-                      <td className="py-3 font-mono text-white">
+                    <tr key={o.id} className="border-t border-white/10 align-middle">
+                      <td className="py-3 align-middle font-mono text-white whitespace-nowrap">
                         <button onClick={() => setViewingOrder(o)} className="flex items-center gap-1.5 hover:text-orange-400 transition-colors">
                           <Eye size={12} /> {o.id.slice(-8)}
                         </button>
                       </td>
-                      <td className="py-3 font-serif text-white">{o.customer}</td>
-                      <td className="py-3 font-mono text-neutral-400">{o.items}</td>
-                      <td className="py-3 font-mono text-white">${o.total.toFixed(2)}</td>
-                      <td className="py-3">
-                        <div className="flex flex-col gap-1">
+                      <td className="py-3 align-middle font-serif text-white whitespace-nowrap">{o.customer}</td>
+                      <td className="py-3 align-middle font-mono text-neutral-400">{o.items}</td>
+                      <td className="py-3 align-middle font-mono text-white whitespace-nowrap">${o.total.toFixed(2)}</td>
+                      <td className="py-3 align-middle">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
                           <span className="font-serif text-xs text-neutral-400">{o.paymentMethod}</span>
                           <Pill color={ps.color} bg={ps.bg} border={ps.border}>{o.paymentStatus}</Pill>
                         </div>
                       </td>
-                      <td className="py-3"><Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill></td>
-                      <td className="py-3 font-mono text-neutral-500">{o.date}</td>
-                      <td className="py-3 text-right relative">
-                        <button onClick={() => setOpenMenuId(openMenuId === o.id ? null : o.id)}>
+                      <td className="py-3 align-middle whitespace-nowrap">
+                        <Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill>
+                      </td>
+                      <td className="py-3 align-middle font-mono text-neutral-500 whitespace-nowrap">{o.date}</td>
+                      <td className="py-3 align-middle text-right">
+                        <button
+                          ref={(el) => (btnRefs.current[o.id] = el)}
+                          onClick={() => toggleMenu(o.id)}
+                          className="p-1 rounded hover:bg-white/5 transition-colors"
+                        >
                           <MoreHorizontal size={16} color="#A3A3A3" />
                         </button>
-                        {openMenuId === o.id && (
-                          <div className="absolute right-0 top-8 z-20 w-52 rounded-lg border border-white/10 bg-neutral-900 shadow-xl overflow-hidden">
-                            <p className="px-3 pt-2 pb-1 text-[10px] font-serif uppercase tracking-wide text-neutral-600">Order status</p>
-                            {ORDER_STATUSES.map((s2) => (
-                              <button
-                                key={s2}
-                                onClick={() => updateStatus(o.id, s2)}
-                                className="w-full text-left px-3 py-2 text-xs font-serif text-neutral-300 hover:bg-white/5 flex items-center justify-between"
-                              >
-                                Mark {s2}
-                                {o.status === s2 && <Check size={12} color="#FB923C" />}
-                              </button>
-                            ))}
-                            <p className="px-3 pt-2 pb-1 text-[10px] font-serif uppercase tracking-wide text-neutral-600 border-t border-white/10">Payment status</p>
-                            {PAYMENT_STATUSES.map((p2) => (
-                              <button
-                                key={p2}
-                                onClick={() => updatePaymentStatus(o.id, p2)}
-                                className="w-full text-left px-3 py-2 text-xs font-serif text-neutral-300 hover:bg-white/5 flex items-center justify-between"
-                              >
-                                Mark {p2}
-                                {o.paymentStatus === p2 && <Check size={12} color="#FB923C" />}
-                              </button>
-                            ))}
-                            <button
-                              onClick={() => removeOrder(o.id)}
-                              className="w-full text-left px-3 py-2 text-xs font-serif text-red-400 hover:bg-white/5 flex items-center gap-1.5 border-t border-white/10"
-                            >
-                              <Trash2 size={12} /> Delete order
-                            </button>
-                          </div>
-                        )}
                       </td>
                     </tr>
                   );
@@ -190,8 +205,60 @@ export default function Order() {
         </div>
       </GlassCard>
 
+      {/* Dropdown menu — portal se render hota hai isliye table scroll/overflow me clip nahi hota */}
+      {openMenuId &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="fixed z-[999] w-52 rounded-lg border border-white/10 bg-neutral-900 shadow-xl overflow-hidden"
+            style={{ top: menuPos.top, left: Math.max(menuPos.left, 8) }}
+          >
+            <p className="px-3 pt-2 pb-1 text-[10px] font-serif uppercase tracking-wide text-neutral-600">Order status</p>
+            {ORDER_STATUSES.map((s2) => {
+              const o = orders.find((x) => x.id === openMenuId);
+              return (
+                <button
+                  key={s2}
+                  onClick={() => updateStatus(openMenuId, s2)}
+                  className="w-full text-left px-3 py-2 text-xs font-serif text-neutral-300 hover:bg-white/5 flex items-center justify-between"
+                >
+                  Mark {s2}
+                  {o?.status === s2 && <Check size={12} color="#FB923C" />}
+                </button>
+              );
+            })}
+            <p className="px-3 pt-2 pb-1 text-[10px] font-serif uppercase tracking-wide text-neutral-600 border-t border-white/10">Payment status</p>
+            {PAYMENT_STATUSES.map((p2) => {
+              const o = orders.find((x) => x.id === openMenuId);
+              return (
+                <button
+                  key={p2}
+                  onClick={() => updatePaymentStatus(openMenuId, p2)}
+                  className="w-full text-left px-3 py-2 text-xs font-serif text-neutral-300 hover:bg-white/5 flex items-center justify-between"
+                >
+                  Mark {p2}
+                  {o?.paymentStatus === p2 && <Check size={12} color="#FB923C" />}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => removeOrder(openMenuId)}
+              className="w-full text-left px-3 py-2 text-xs font-serif text-red-400 hover:bg-white/5 flex items-center gap-1.5 border-t border-white/10"
+            >
+              <Trash2 size={12} /> Delete order
+            </button>
+          </div>,
+          document.body
+        )}
+
       {viewingOrder && (
-        <Modal title={`Order #${viewingOrder.id.slice(-8)}`} onClose={() => setViewingOrder(null)}>
+        <Modal
+          title={`Order #${viewingOrder.id.slice(-8)}`}
+          onClose={() => {
+            setViewingOrder(null);
+            setReceiptZoom(false);
+          }}
+        >
           <div className="flex flex-col gap-4">
             <div>
               <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Items</p>
@@ -223,16 +290,77 @@ export default function Order() {
             <div>
               <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Payment</p>
               <div className="px-3 py-2.5 rounded-lg border border-white/10 bg-white/[0.03] text-sm font-serif text-neutral-300 flex flex-col gap-1">
-                <p>Method: <span className="text-white">{viewingOrder.paymentMethod}</span></p>
-                <p>Status: <span className="text-white">{viewingOrder.paymentStatus}</span></p>
+                <div className="flex items-center gap-2">
+                  <span>Method:</span> <span className="text-white">{viewingOrder.paymentMethod}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>Status:</span>
+                  {(() => {
+                    const ps = paymentStatusStyle(viewingOrder.paymentStatus);
+                    return <Pill color={ps.color} bg={ps.bg} border={ps.border}>{viewingOrder.paymentStatus}</Pill>;
+                  })()}
+                </div>
+
                 {viewingOrder.bankTransferDetails?.transactionId && (
                   <>
                     <p>Transaction ID: <span className="text-white font-mono">{viewingOrder.bankTransferDetails.transactionId}</span></p>
-                    {viewingOrder.bankTransferDetails.bankName && <p>Bank: <span className="text-white">{viewingOrder.bankTransferDetails.bankName}</span></p>}
+                    {viewingOrder.bankTransferDetails.bankName && (
+                      <p>Bank: <span className="text-white">{viewingOrder.bankTransferDetails.bankName}</span></p>
+                    )}
+                    {viewingOrder.bankTransferDetails.accountTitle && (
+                      <p>Account Title: <span className="text-white">{viewingOrder.bankTransferDetails.accountTitle}</span></p>
+                    )}
+                    {viewingOrder.bankTransferDetails.accountNumber && (
+                      <p>Account No: <span className="text-white font-mono">{viewingOrder.bankTransferDetails.accountNumber}</span></p>
+                    )}
                   </>
                 )}
               </div>
             </div>
+
+            {/* Payment receipt — admin yahan se verify karega */}
+            {viewingOrder.paymentMethod === "Bank Transfer" && (
+              <div>
+                <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Payment receipt</p>
+                {viewingOrder.bankTransferDetails?.receiptImage ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setReceiptZoom(true)}
+                      className="block w-full rounded-lg overflow-hidden border border-white/10 hover:border-orange-500/40 transition-colors"
+                    >
+                      <img
+                        src={viewingOrder.bankTransferDetails.receiptImage}
+                        alt="Payment receipt"
+                        className="w-full max-h-64 object-contain bg-black/30"
+                      />
+                    </button>
+                    <p className="text-[11px] font-serif text-neutral-600 mt-1">Click the receipt to view full size.</p>
+
+                    {viewingOrder.paymentStatus === "Pending" && (
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={() => updatePaymentStatus(viewingOrder.id, "Paid")}
+                          className="flex-1 px-3 py-2 rounded-lg text-xs font-serif border border-green-500/30 bg-green-500/10 text-green-300 hover:bg-green-500/15 transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <Check size={12} /> Verify & mark Paid
+                        </button>
+                        <button
+                          onClick={() => updatePaymentStatus(viewingOrder.id, "Failed")}
+                          className="flex-1 px-3 py-2 rounded-lg text-xs font-serif border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/15 transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <X size={12} /> Reject
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-4 rounded-lg border border-dashed border-white/10 text-neutral-500 text-xs font-serif justify-center">
+                    <ImageOff size={14} /> No receipt uploaded
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-orange-500/25 bg-orange-500/10">
               <span className="text-sm font-serif text-orange-300">Total</span>
@@ -241,6 +369,30 @@ export default function Order() {
           </div>
         </Modal>
       )}
+
+      {/* Receipt full-size lightbox */}
+      {receiptZoom &&
+        viewingOrder?.bankTransferDetails?.receiptImage &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center p-6"
+            onClick={() => setReceiptZoom(false)}
+          >
+            <button
+              onClick={() => setReceiptZoom(false)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              <X size={18} />
+            </button>
+            <img
+              src={viewingOrder.bankTransferDetails.receiptImage}
+              alt="Payment receipt full size"
+              className="max-w-full max-h-full rounded-lg object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>,
+          document.body
+        )}
 
       {toast && (
         <div className="fixed top-5 right-5 z-[999]">

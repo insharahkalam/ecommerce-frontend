@@ -1,183 +1,21 @@
-// import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { CheckCircle2, XCircle } from "lucide-react";
-// import GlassCard from "../../components/GlassCard";
-// import PrimaryButton from "../../components/PrimaryButton";
-// import { FieldLabel, TextField } from "../../components/FormFields";
-// import { useCart } from "../../context/CartContext";
-// import api from "../../config/axios";
-// import { ORDERS_API_URL } from "../../data/mockData";
-
-// export default function Checkout() {
-//     const { cart, cartTotal, clearCart } = useCart();
-//     const navigate = useNavigate();
-
-//     const [fullName, setFullName] = useState("");
-//     const [phone, setPhone] = useState("");
-//     const [address, setAddress] = useState("");
-//     const [city, setCity] = useState("");
-//     const [paymentMethod, setPaymentMethod] = useState("COD");
-//     const [bankName, setBankName] = useState("");
-//     const [transactionId, setTransactionId] = useState("");
-//     const [submitting, setSubmitting] = useState(false);
-//     const [toast, setToast] = useState(null);
-
-//     function showToast(message, type = "error") {
-//         setToast({ message, type });
-//         setTimeout(() => setToast(null), 3000);
-//     }
-
-//     async function handlePlaceOrder(e) {
-//         e.preventDefault();
-
-//         if (!fullName.trim() || !phone.trim() || !address.trim() || !city.trim()) {
-//             showToast("Please fill in your complete shipping address.");
-//             return;
-//         }
-//         if (paymentMethod === "Bank Transfer" && !transactionId.trim()) {
-//             showToast("Please enter your bank transfer transaction ID.");
-//             return;
-//         }
-
-//         setSubmitting(true);
-//         try {
-//             const payload = {
-//                 items: cart.map((i) => ({
-//                     product: i.productId,
-//                     title: i.title,
-//                     price: i.price,
-//                     quantity: i.quantity,
-//                     image: i.image,
-//                 })),
-//                 totalAmount: cartTotal,
-//                 paymentMethod,
-//                 shippingAddress: { fullName, phone, address, city },
-//                 ...(paymentMethod === "Bank Transfer" && {
-//                     bankTransferDetails: { bankName, transactionId },
-//                 }),
-//             };
-
-//             await api.post(`${ORDERS_API_URL}/createOrder`, payload);
-
-//             clearCart();
-//             showToast("Order placed successfully!", "success");
-//             setTimeout(() => navigate("/my-orders"), 1200);
-//         } catch (err) {
-//             showToast(err.response?.data?.message || "Could not place order. Please try again.");
-//         } finally {
-//             setSubmitting(false);
-//         }
-//     }
-
-//     if (cart.length === 0) {
-//         return <p className="text-neutral-500 font-serif text-sm">Your cart is empty.</p>;
-//     }
-
-//     return (
-//         <div className="flex flex-col gap-6 max-w-xl">
-//             <h1 className="font-display italic text-2xl font-semibold text-white">Checkout</h1>
-
-//             <form onSubmit={handlePlaceOrder} className="flex flex-col gap-4">
-//                 <GlassCard>
-//                     <div className="p-5 flex flex-col gap-4">
-//                         <p className="text-xs font-serif uppercase tracking-wide text-neutral-500">Shipping address</p>
-//                         <div>
-//                             <FieldLabel required>Full name</FieldLabel>
-//                             <TextField value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ayesha Khan" />
-//                         </div>
-//                         <div>
-//                             <FieldLabel required>Phone</FieldLabel>
-//                             <TextField value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+92 300 1234567" />
-//                         </div>
-//                         <div>
-//                             <FieldLabel required>Address</FieldLabel>
-//                             <TextField value={address} onChange={(e) => setAddress(e.target.value)} placeholder="House 12, Street 5, DHA" />
-//                         </div>
-//                         <div>
-//                             <FieldLabel required>City</FieldLabel>
-//                             <TextField value={city} onChange={(e) => setCity(e.target.value)} placeholder="Karachi" />
-//                         </div>
-//                     </div>
-//                 </GlassCard>
-
-//                 <GlassCard>
-//                     <div className="p-5 flex flex-col gap-3">
-//                         <p className="text-xs font-serif uppercase tracking-wide text-neutral-500">Payment method</p>
-//                         <div className="flex gap-3">
-//                             {["COD", "Bank Transfer"].map((m) => (
-//                                 <button
-//                                     type="button"
-//                                     key={m}
-//                                     onClick={() => setPaymentMethod(m)}
-//                                     className="flex-1 px-3 py-2.5 rounded-lg text-sm font-serif border transition-colors"
-//                                     style={{
-//                                         background: paymentMethod === m ? "rgba(249,115,22,0.14)" : "transparent",
-//                                         color: paymentMethod === m ? "#FB923C" : "#A3A3A3",
-//                                         borderColor: paymentMethod === m ? "rgba(249,115,22,0.3)" : "rgba(255,255,255,0.1)",
-//                                     }}
-//                                 >
-//                                     {m === "COD" ? "Cash on Delivery" : "Bank Transfer"}
-//                                 </button>
-//                             ))}
-//                         </div>
-
-//                         {paymentMethod === "Bank Transfer" && (
-//                             <div className="flex flex-col gap-3 mt-2">
-//                                 <div className="px-3 py-2.5 rounded-lg border border-orange-500/25 bg-orange-500/10 text-xs font-serif text-orange-300">
-//                                     Transfer ${cartTotal.toFixed(2)} to our account, then enter your transaction ID below. Your order will be marked "Paid" after we verify it.
-//                                 </div>
-//                                 <div>
-//                                     <FieldLabel>Bank name</FieldLabel>
-//                                     <TextField value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="Meezan Bank" />
-//                                 </div>
-//                                 <div>
-//                                     <FieldLabel required>Transaction ID</FieldLabel>
-//                                     <TextField value={transactionId} onChange={(e) => setTransactionId(e.target.value)} placeholder="TXN123456789" />
-//                                 </div>
-//                             </div>
-//                         )}
-//                     </div>
-//                 </GlassCard>
-
-//                 <GlassCard>
-//                     <div className="p-5 flex items-center justify-between">
-//                         <span className="font-serif text-neutral-400">Total to pay</span>
-//                         <span className="font-mono text-xl text-white">${cartTotal.toFixed(2)}</span>
-//                     </div>
-//                 </GlassCard>
-
-//                 <PrimaryButton type="submit" disabled={submitting} className="justify-center">
-//                     {submitting ? "Placing order…" : "Place order"}
-//                 </PrimaryButton>
-//             </form>
-
-//             {toast && (
-//                 <div className="fixed top-5 right-5 z-[999]">
-//                     <div
-//                         className={`flex items-center gap-2 px-4 py-3 rounded-lg border shadow-xl shadow-black/40 text-sm font-serif backdrop-blur-xl ${toast.type === "success"
-//                                 ? "border-orange-500/25 bg-orange-500/10 text-orange-300"
-//                                 : "border-red-500/25 bg-red-500/10 text-red-300"
-//                             }`}
-//                     >
-//                         {toast.type === "success" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
-//                         <span>{toast.message}</span>
-//                     </div>
-//                 </div>
-//             )}
-//         </div>
-//     );
-// }
-
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, XCircle, Lock, Truck, CreditCard } from "lucide-react";
+import { CheckCircle2, XCircle, Lock, Truck, CreditCard, Copy, Check, UploadCloud, Image as ImageIcon, X, } from "lucide-react";
 import GlassCard from "../../components/GlassCard";
 import PrimaryButton from "../../components/PrimaryButton";
 import { FieldLabel, TextField } from "../../components/FormFields";
 import { useCart } from "../../context/CartContext";
 import api from "../../config/axios";
 import { ORDERS_API_URL } from "../../data/mockData";
+
+// Ye account details ek jagah rakh dein taake future me change karna easy ho
+const BANK_ACCOUNT = {
+    bankName: "Meezan Bank",
+    accountTitle: "Insharah Kalam",
+    accountNumber: "1234567890123",
+};
+
+const MAX_RECEIPT_SIZE_MB = 5;
 
 export default function Checkout() {
     const { cart, cartTotal, clearCart } = useCart();
@@ -188,8 +26,17 @@ export default function Checkout() {
     const [address, setAddress] = useState("");
     const [city, setCity] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("COD");
-    const [bankName, setBankName] = useState("");
     const [transactionId, setTransactionId] = useState("");
+
+    // Receipt upload state
+    const [receiptPreview, setReceiptPreview] = useState(null); // base64 data url (bhejne ke liye)
+    const [receiptName, setReceiptName] = useState("");
+    const [receiptError, setReceiptError] = useState("");
+
+    // "Maine payment kar di hai" confirmation checkbox — verification step
+    const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+
+    const [copied, setCopied] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [toast, setToast] = useState(null);
 
@@ -202,15 +49,65 @@ export default function Checkout() {
         setTimeout(() => setToast(null), 3000);
     }
 
+    function handleCopyAccountNumber() {
+        navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        });
+    }
+
+    function handleReceiptChange(e) {
+        const file = e.target.files?.[0];
+        setReceiptError("");
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            setReceiptError("Sirf image file (jpg, png, etc.) upload karein.");
+            e.target.value = "";
+            return;
+        }
+        if (file.size > MAX_RECEIPT_SIZE_MB * 1024 * 1024) {
+            setReceiptError(`Receipt ki size ${MAX_RECEIPT_SIZE_MB}MB se kam honi chahiye.`);
+            e.target.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setReceiptPreview(reader.result);
+            setReceiptName(file.name);
+        };
+        reader.onerror = () => setReceiptError("Receipt read nahi ho saki, dobara try karein.");
+        reader.readAsDataURL(file);
+    }
+
+    function handleRemoveReceipt() {
+        setReceiptPreview(null);
+        setReceiptName("");
+        setReceiptError("");
+    }
+
     async function handlePlaceOrder(e) {
         e.preventDefault();
+
         if (!fullName.trim() || !phone.trim() || !address.trim() || !city.trim()) {
             showToast("Please fill in your complete shipping address.");
             return;
         }
-        if (paymentMethod === "Bank Transfer" && !transactionId.trim()) {
-            showToast("Please enter your bank transfer transaction ID.");
-            return;
+
+        if (paymentMethod === "Bank Transfer") {
+            if (!transactionId.trim()) {
+                showToast("Please enter your bank transfer transaction ID.");
+                return;
+            }
+            if (!receiptPreview) {
+                showToast("Please upload your payment receipt screenshot.");
+                return;
+            }
+            if (!paymentConfirmed) {
+                showToast("Please confirm that you have completed the payment.");
+                return;
+            }
         }
 
         setSubmitting(true);
@@ -227,10 +124,18 @@ export default function Checkout() {
                 paymentMethod,
                 shippingAddress: { fullName, phone, address, city },
                 ...(paymentMethod === "Bank Transfer" && {
-                    bankTransferDetails: { bankName, transactionId },
+                    bankTransferDetails: {
+                        bankName: BANK_ACCOUNT.bankName,
+                        accountTitle: BANK_ACCOUNT.accountTitle,
+                        accountNumber: BANK_ACCOUNT.accountNumber,
+                        transactionId,
+                        receiptImage: receiptPreview, // base64 data url
+                    },
                 }),
             };
+
             await api.post(`${ORDERS_API_URL}/createOrder`, payload);
+
             clearCart();
             showToast("Order placed successfully!", "success");
             setTimeout(() => navigate("/my-orders"), 1200);
@@ -330,22 +235,118 @@ export default function Checkout() {
                         </div>
 
                         {paymentMethod === "Bank Transfer" && (
-                            <div className="flex flex-col gap-3 mt-1">
-                                <div className="px-3 py-2.5 rounded-lg border border-orange-500/25 bg-orange-500/10 text-xs font-serif text-orange-300">
-                                    Transfer ${grandTotal.toFixed(2)} to our account, then enter your transaction ID below. Your order will be marked "Paid" after verification.
+                            <div className="flex flex-col gap-4 mt-1">
+                                {/* Bank details card — makes payment easy for the customer */}
+                                <div className="rounded-xl border border-orange-500/25 bg-orange-500/[0.07] p-4 flex flex-col gap-3">
+                                    <p className="text-xs font-serif text-orange-300">
+                                        Please transfer{" "}
+                                        <span className="font-mono text-orange-200">${grandTotal.toFixed(2)}</span>{" "}
+                                        to the account below:
+                                    </p>
+
+                                    <div className="rounded-lg bg-black/20 divide-y divide-white/5">
+                                        <DetailRow label="Bank Name" value={BANK_ACCOUNT.bankName} />
+                                        <DetailRow label="Account Title" value={BANK_ACCOUNT.accountTitle} />
+                                        <DetailRow
+                                            label="Account Number"
+                                            value={BANK_ACCOUNT.accountNumber}
+                                            action={
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCopyAccountNumber}
+                                                    className="flex items-center gap-1 text-[11px] font-serif text-orange-300 hover:text-orange-200 transition-colors"
+                                                >
+                                                    {copied ? <Check size={12} /> : <Copy size={12} />}
+                                                    {copied ? "Copied" : "Copy"}
+                                                </button>
+                                            }
+                                        />
+                                    </div>
+
+                                    <p className="text-[11px] font-serif text-neutral-500">
+                                        After completing the payment, enter your transaction ID and upload a screenshot of the payment receipt below. Your order will be marked as <strong>"Paid"</strong> once the payment has been verified.
+                                    </p>
                                 </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div>
-                                        <FieldLabel>Bank name</FieldLabel>
-                                        <TextField value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="Meezan Bank" />
-                                    </div>
-                                    <div>
                                         <FieldLabel required>Transaction ID</FieldLabel>
-                                        <TextField value={transactionId} onChange={(e) => setTransactionId(e.target.value)} placeholder="TXN123456789" />
+                                        <TextField
+                                            value={transactionId}
+                                            onChange={(e) => setTransactionId(e.target.value)}
+                                            placeholder="TXN123456789"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <FieldLabel required>Payment Receipt</FieldLabel>
+                                        {!receiptPreview ? (
+                                            <label
+                                                htmlFor="receipt-upload"
+                                                className="flex items-center justify-center gap-2 h-[42px] rounded-lg border border-dashed border-white/15 bg-white/[0.02] text-xs font-serif text-neutral-400 cursor-pointer hover:border-orange-500/40 hover:text-orange-300 transition-colors"
+                                            >
+                                                <UploadCloud size={14} />
+                                                Upload Receipt
+                                                <input
+                                                    id="receipt-upload"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleReceiptChange}
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                        ) : (
+                                            <div className="flex items-center gap-2 h-[42px] px-3 rounded-lg border border-white/10 bg-white/[0.03]">
+                                                <div className="w-7 h-7 rounded overflow-hidden flex-shrink-0 ring-1 ring-white/10">
+                                                    <img src={receiptPreview} alt="Receipt" className="w-full h-full object-cover" />
+                                                </div>
+                                                <span className="text-xs font-serif text-neutral-300 truncate flex-1">
+                                                    {receiptName}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveReceipt}
+                                                    className="text-neutral-500 hover:text-red-400 transition-colors flex-shrink-0"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        )}
+                                        {receiptError && (
+                                            <p className="text-[11px] font-serif text-red-400 mt-1">{receiptError}</p>
+                                        )}
                                     </div>
                                 </div>
+
+                                {receiptPreview && (
+                                    <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
+                                        <ImageIcon size={14} className="text-neutral-500 flex-shrink-0" />
+                                        <img
+                                            src={receiptPreview}
+                                            alt="Receipt Preview"
+                                            className="h-16 rounded-md ring-1 ring-white/10 object-cover"
+                                        />
+                                        <span className="text-[11px] font-serif text-neutral-500">
+                                            Receipt Preview
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Verification / confirmation step */}
+                                <label className="flex items-start gap-2 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={paymentConfirmed}
+                                        onChange={(e) => setPaymentConfirmed(e.target.checked)}
+                                        className="mt-0.5 accent-orange-500"
+                                    />
+                                    <span className="text-xs font-serif text-neutral-400">
+                                        I confirm that I have completed the payment to the account above, and the transaction ID and receipt provided are accurate.
+                                    </span>
+                                </label>
                             </div>
                         )}
+
                     </div>
                 </GlassCard>
             </form>
@@ -402,8 +403,8 @@ export default function Checkout() {
                 <div className="fixed top-5 right-5 z-[999]">
                     <div
                         className={`flex items-center gap-2 px-4 py-3 rounded-lg border shadow-xl shadow-black/40 text-sm font-serif backdrop-blur-xl ${toast.type === "success"
-                                ? "border-orange-500/25 bg-orange-500/10 text-orange-300"
-                                : "border-red-500/25 bg-red-500/10 text-red-300"
+                            ? "border-orange-500/25 bg-orange-500/10 text-orange-300"
+                            : "border-red-500/25 bg-red-500/10 text-red-300"
                             }`}
                     >
                         {toast.type === "success" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
@@ -420,6 +421,18 @@ function Row({ label, value }) {
         <div className="flex items-center justify-between">
             <span className="text-neutral-400">{label}</span>
             <span className="text-white font-mono text-xs">{value}</span>
+        </div>
+    );
+}
+
+function DetailRow({ label, value, action }) {
+    return (
+        <div className="flex items-center justify-between px-3 py-2">
+            <div>
+                <p className="text-[10px] font-serif uppercase tracking-wide text-neutral-500">{label}</p>
+                <p className="text-sm font-mono text-white">{value}</p>
+            </div>
+            {action}
         </div>
     );
 }

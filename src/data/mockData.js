@@ -4,7 +4,7 @@ export const AUTH_BASE_URL = "/authentication";
 
 export const ORDERS_API_URL = "/orders";
 
-export const ORDER_STATUSES = ["Pending", "Fulfilled", "Refunded"];
+export const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
 export const revenueData = [
   { day: "Mon", revenue: 4200, orders: 38 },
