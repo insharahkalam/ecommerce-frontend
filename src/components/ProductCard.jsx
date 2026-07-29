@@ -3,15 +3,30 @@ import { Link } from "react-router-dom";
 import { Star, ShoppingBag } from "lucide-react";
 import GlassCard from "./GlassCard";
 
+// deterministic fake rating from product id
+function fakeRating(id = "") {
+  let h = 0;
+  for (let i = 0; i < String(id).length; i++) h = (h * 31 + String(id).charCodeAt(i)) >>> 0;
+  const rating = (3.6 + (h % 14) / 10).toFixed(1); // 3.6 – 4.9
+  const reviews = 12 + (h % 480);
+  return { rating: Number(rating), reviews };
+}
+
 export default function ProductCard({ p, onAdd }) {
   const discounted = p.discount > 0 ? p.price - (p.price * p.discount) / 100 : p.price;
+  const { rating, reviews } = fakeRating(p.id);
+
   return (
     <GlassCard>
       <Link to={`/product/${p.id}`} className="block relative group">
         <div className="aspect-square w-full bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-t-2xl overflow-hidden">
           {p.image && (
-            <img src={p.image} alt={p.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img
+              src={p.image}
+              alt={p.name}
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
           )}
         </div>
         {p.discount > 0 && (
@@ -25,17 +40,40 @@ export default function ProductCard({ p, onAdd }) {
           </span>
         )}
       </Link>
+
       <div className="p-4 flex flex-col gap-2">
         <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">{p.category}</p>
-        <Link to={`/product/${p.id}`} className="text-sm font-serif text-white hover:text-orange-400 line-clamp-2 min-h-[2.5rem]">
+
+        <Link
+          to={`/product/${p.id}`}
+          className="text-sm font-serif text-white hover:text-orange-400 line-clamp-2 min-h-[2.5rem]"
+        >
           {p.name}
         </Link>
+
+        {/* rating */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Star
+                key={i}
+                size={12}
+                className={i <= Math.round(rating) ? "text-amber-400" : "text-neutral-700"}
+                fill={i <= Math.round(rating) ? "currentColor" : "none"}
+              />
+            ))}
+          </div>
+          <span className="font-mono text-[11px] text-neutral-300">{rating.toFixed(1)}</span>
+          <span className="font-mono text-[11px] text-neutral-600">({reviews})</span>
+        </div>
+
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-lg text-white">${discounted.toFixed(2)}</span>
           {p.discount > 0 && (
             <span className="text-xs font-mono text-neutral-500 line-through">${p.price.toFixed(2)}</span>
           )}
         </div>
+
         <button
           onClick={() => onAdd?.(p)}
           disabled={p.stock === 0}

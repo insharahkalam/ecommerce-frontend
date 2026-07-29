@@ -4,6 +4,7 @@ import loginImg from "../assets/login.jpg";
 import api from "../config/axios";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
     const [showPass, setShowPass] = useState(false);
@@ -12,6 +13,7 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { loginUser } = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -25,6 +27,13 @@ export default function Login() {
         try {
             setLoading(true);
             const res = await api.post("/authentication/login", formData);
+
+            // Backend jo bhi user object bhejta hai (res.data.user ho ya seedha res.data),
+            // usay AuthContext me save karna zaroori hai — warna Navbar ko pata hi nahi
+            // chalega ke user login ho chuka hai.
+            const loggedInUser = res?.data?.user || res?.data;
+            loginUser(loggedInUser);
+
             toast.success(res?.data?.message || "Login successfully!");
             setEmail(""); setPassword("");
             setTimeout(() => {
