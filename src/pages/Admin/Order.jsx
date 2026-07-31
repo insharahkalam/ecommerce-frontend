@@ -56,7 +56,6 @@ export default function Order() {
     setOpenMenuId(id);
   }
 
-  // Bahar click / scroll karne par menu band ho jaye
   useEffect(() => {
     if (!openMenuId) return;
     function handleOutside(e) {
@@ -74,6 +73,13 @@ export default function Order() {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [openMenuId]);
+
+  useEffect(() => {
+    if (viewingOrder) {
+      const updated = orders.find((o) => o.id === viewingOrder.id);
+      if (updated) setViewingOrder(updated);
+    }
+  }, [orders]);
 
   async function updateStatus(id, status) {
     const prev = orders;
