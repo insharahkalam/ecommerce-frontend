@@ -46,7 +46,7 @@ function normalizeOrder(o) {
     paymentMethod: o.paymentMethod || "COD",
     paymentStatus: o.paymentStatus || "Pending",
     shippingAddress: o.shippingAddress || {},
-    bankTransferDetails: o.bankTransferDetails || null,
+    transferDetails: o.transferDetails || null,
     date: o.createdAt
       ? new Date(o.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
       : "—",

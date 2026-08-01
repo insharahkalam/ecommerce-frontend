@@ -325,7 +325,7 @@ export default function Order() {
             </div>
 
             {/* Payment receipt — admin yahan se verify karega */}
-            {viewingOrder.paymentMethod === "Bank Transfer" && (
+            {(viewingOrder.paymentMethod === "Bank Transfer" || viewingOrder.paymentMethod === "Easypaisa") && (
               <div>
                 <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Payment receipt</p>
                 {viewingOrder.transferDetails?.receiptImage ? (
