@@ -15,6 +15,11 @@ const BANK_ACCOUNT = {
     accountNumber: "1234567890123",
 };
 
+const EASYPAISA_ACCOUNT = {
+    accountTitle: "Insharah Kalam",
+    accountNumber: "0300-1234567",
+};
+
 const MAX_RECEIPT_SIZE_MB = 5;
 
 export default function Checkout() {
@@ -44,13 +49,17 @@ export default function Checkout() {
     const tax = +(cartTotal * 0.05).toFixed(2);
     const grandTotal = +(cartTotal + shipping + tax).toFixed(2);
 
+
+    const isDigitalTransfer = paymentMethod === "Bank Transfer" || paymentMethod === "Easypaisa";
+    const activeAccount = paymentMethod === "Easypaisa" ? EASYPAISA_ACCOUNT : BANK_ACCOUNT;
+
     function showToast(message, type = "error") {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
     }
 
     function handleCopyAccountNumber() {
-        navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber).then(() => {
+        navigator.clipboard.writeText(activeAccount.accountNumber).then(() => {
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
         });
@@ -95,9 +104,9 @@ export default function Checkout() {
             return;
         }
 
-        if (paymentMethod === "Bank Transfer") {
+        if (isDigitalTransfer) {
             if (!transactionId.trim()) {
-                showToast("Please enter your bank transfer transaction ID.");
+                showToast("Please enter your transaction ID.");
                 return;
             }
             if (!receiptPreview) {
@@ -123,13 +132,12 @@ export default function Checkout() {
                 totalAmount: grandTotal,
                 paymentMethod,
                 shippingAddress: { fullName, phone, address, city },
-                ...(paymentMethod === "Bank Transfer" && {
-                    bankTransferDetails: {
-                        bankName: BANK_ACCOUNT.bankName,
-                        accountTitle: BANK_ACCOUNT.accountTitle,
-                        accountNumber: BANK_ACCOUNT.accountNumber,
+                ...(isDigitalTransfer && {
+                    transferDetails: {
+                        accountTitle: activeAccount.accountTitle,
+                        accountNumber: activeAccount.accountNumber,
                         transactionId,
-                        receiptImage: receiptPreview, // base64 data url
+                        receiptImage: receiptPreview,
                     },
                 }),
             };
@@ -205,10 +213,11 @@ export default function Checkout() {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-3 gap-3">
                             {[
                                 { id: "COD", label: "Cash on Delivery", desc: "Pay when you receive" },
                                 { id: "Bank Transfer", label: "Bank Transfer", desc: "Direct to our account" },
+                                { id: "Easypaisa", label: "Easypaisa", desc: "Mobile wallet transfer" },
                             ].map((m) => {
                                 const active = paymentMethod === m.id;
                                 return (
@@ -234,7 +243,7 @@ export default function Checkout() {
                             })}
                         </div>
 
-                        {paymentMethod === "Bank Transfer" && (
+                        {isDigitalTransfer && (
                             <div className="flex flex-col gap-4 mt-1">
                                 {/* Bank details card — makes payment easy for the customer */}
                                 <div className="rounded-xl border border-orange-500/25 bg-orange-500/[0.07] p-4 flex flex-col gap-3">
@@ -245,11 +254,13 @@ export default function Checkout() {
                                     </p>
 
                                     <div className="rounded-lg bg-black/20 divide-y divide-white/5">
-                                        <DetailRow label="Bank Name" value={BANK_ACCOUNT.bankName} />
-                                        <DetailRow label="Account Title" value={BANK_ACCOUNT.accountTitle} />
+                                        {paymentMethod === "Bank Transfer" && (
+                                            <DetailRow label="Bank Name" value={BANK_ACCOUNT.bankName} />
+                                        )}
+                                        <DetailRow label="Account Title" value={activeAccount.accountTitle} />
                                         <DetailRow
-                                            label="Account Number"
-                                            value={BANK_ACCOUNT.accountNumber}
+                                            label={paymentMethod === "Easypaisa" ? "Easypaisa Number" : "Account Number"}
+                                            value={activeAccount.accountNumber}
                                             action={
                                                 <button
                                                     type="button"
