@@ -307,17 +307,17 @@ export default function Order() {
                   })()}
                 </div>
 
-                {viewingOrder.bankTransferDetails?.transactionId && (
+                {viewingOrder.transferDetails?.transactionId && (
                   <>
-                    <p>Transaction ID: <span className="text-white font-mono">{viewingOrder.bankTransferDetails.transactionId}</span></p>
-                    {viewingOrder.bankTransferDetails.bankName && (
-                      <p>Bank: <span className="text-white">{viewingOrder.bankTransferDetails.bankName}</span></p>
+                    <p>Transaction ID: <span className="text-white font-mono">{viewingOrder.transferDetails.transactionId}</span></p>
+                    {viewingOrder.transferDetails.bankName && (
+                      <p>Bank: <span className="text-white">{viewingOrder.transferDetails.bankName}</span></p>
                     )}
-                    {viewingOrder.bankTransferDetails.accountTitle && (
-                      <p>Account Title: <span className="text-white">{viewingOrder.bankTransferDetails.accountTitle}</span></p>
+                    {viewingOrder.transferDetails.accountTitle && (
+                      <p>Account Title: <span className="text-white">{viewingOrder.transferDetails.accountTitle}</span></p>
                     )}
-                    {viewingOrder.bankTransferDetails.accountNumber && (
-                      <p>Account No: <span className="text-white font-mono">{viewingOrder.bankTransferDetails.accountNumber}</span></p>
+                    {viewingOrder.transferDetails.accountNumber && (
+                      <p>Account No: <span className="text-white font-mono">{viewingOrder.transferDetails.accountNumber}</span></p>
                     )}
                   </>
                 )}
@@ -328,7 +328,7 @@ export default function Order() {
             {viewingOrder.paymentMethod === "Bank Transfer" && (
               <div>
                 <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Payment receipt</p>
-                {viewingOrder.bankTransferDetails?.receiptImage ? (
+                {viewingOrder.transferDetails?.receiptImage ? (
                   <>
                     <button
                       type="button"
@@ -336,7 +336,7 @@ export default function Order() {
                       className="block w-full rounded-lg overflow-hidden border border-white/10 hover:border-orange-500/40 transition-colors"
                     >
                       <img
-                        src={viewingOrder.bankTransferDetails.receiptImage}
+                        src={viewingOrder.transferDetails.receiptImage}
                         alt="Payment receipt"
                         className="w-full max-h-64 object-contain bg-black/30"
                       />
@@ -378,7 +378,7 @@ export default function Order() {
 
       {/* Receipt full-size lightbox */}
       {receiptZoom &&
-        viewingOrder?.bankTransferDetails?.receiptImage &&
+        viewingOrder?.transferDetails?.receiptImage &&
         createPortal(
           <div
             className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center p-6"
@@ -391,7 +391,7 @@ export default function Order() {
               <X size={18} />
             </button>
             <img
-              src={viewingOrder.bankTransferDetails.receiptImage}
+              src={viewingOrder.transferDetails.receiptImage}
               alt="Payment receipt full size"
               className="max-w-full max-h-full rounded-lg object-contain"
               onClick={(e) => e.stopPropagation()}
