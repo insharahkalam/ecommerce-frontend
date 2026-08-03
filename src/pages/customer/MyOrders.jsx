@@ -45,58 +45,59 @@ function OrderProgress({ status }) {
             </div>
         );
     }
-}
 
+    const idx = FLOW.findIndex((s) => s.key === status);
+    const activeIdx = idx === -1 ? 0 : idx;
 
-return (
-    <div className="flex items-start w-full">
-        {FLOW.map((step, i) => {
-            const Icon = step.icon;
-            const done = i <= activeIdx;
-            const current = i === activeIdx;
-            const isLast = i === FLOW.length - 1;
-            return (
-                <React.Fragment key={step.key}>
-                    <div className="flex flex-col items-center gap-2 shrink-0 w-[68px] sm:w-[88px]">
-                        <span className="relative flex items-center justify-center">
-                            {current && (
+    return (
+        <div className="flex items-start w-full">
+            {FLOW.map((step, i) => {
+                const Icon = step.icon;
+                const done = i <= activeIdx;
+                const current = i === activeIdx;
+                const isLast = i === FLOW.length - 1;
+                return (
+                    <React.Fragment key={step.key}>
+                        <div className="flex flex-col items-center gap-2 shrink-0 w-[68px] sm:w-[88px]">
+                            <span className="relative flex items-center justify-center">
+                                {current && (
+                                    <span
+                                        className="absolute inset-0 rounded-full animate-ping"
+                                        style={{ background: "rgba(251,146,60,0.25)" }}
+                                    />
+                                )}
                                 <span
-                                    className="absolute inset-0 rounded-full animate-ping"
-                                    style={{ background: "rgba(251,146,60,0.25)" }}
-                                />
-                            )}
-                            <span
-                                className="relative w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300"
-                                style={{
-                                    background: done ? "rgba(251,146,60,0.14)" : "rgba(255,255,255,0.03)",
-                                    borderColor: done ? "rgba(251,146,60,0.55)" : "rgba(255,255,255,0.10)",
-                                }}
-                            >
-                                <Icon size={14} color={done ? ACCENT : "#525252"} />
+                                    className="relative w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300"
+                                    style={{
+                                        background: done ? "rgba(251,146,60,0.14)" : "rgba(255,255,255,0.03)",
+                                        borderColor: done ? "rgba(251,146,60,0.55)" : "rgba(255,255,255,0.10)",
+                                    }}
+                                >
+                                    <Icon size={14} color={done ? ACCENT : "#525252"} />
+                                </span>
                             </span>
-                        </span>
-                        <span
-                            className="font-serif text-[10.5px] leading-tight text-center tracking-wide"
-                            style={{ color: done ? "#D4D4D4" : "#525252" }}
-                        >
-                            {step.label}
-                        </span>
-                    </div>
-                    {!isLast && (
-                        <div
-                            className="h-px flex-1 mt-4 transition-colors duration-300"
-                            style={{
-                                background:
-                                    i < activeIdx ? "rgba(251,146,60,0.5)" : "rgba(255,255,255,0.08)",
-                            }}
-                        />
-                    )}
-                </React.Fragment>
-            );
-        })}
-    </div>
-);
-
+                            <span
+                                className="font-serif text-[10.5px] leading-tight text-center tracking-wide"
+                                style={{ color: done ? "#D4D4D4" : "#525252" }}
+                            >
+                                {step.label}
+                            </span>
+                        </div>
+                        {!isLast && (
+                            <div
+                                className="h-px flex-1 mt-4 transition-colors duration-300"
+                                style={{
+                                    background:
+                                        i < activeIdx ? "rgba(251,146,60,0.5)" : "rgba(255,255,255,0.08)",
+                                }}
+                            />
+                        )}
+                    </React.Fragment>
+                );
+            })}
+        </div>
+    );
+}
 
 /* ------------------------------- Small building blocks ------------------------------- */
 function StatTile({ icon: Icon, label, value, hint }) {
@@ -125,10 +126,6 @@ export default function MyOrders() {
     const { user } = useAuth();
     const userId = user?._id || user?.id;
 
-
-    const idx = FLOW.findIndex((s) => s.key === status);
-    const activeIdx = idx === -1 ? 0 : idx;
-
     useEffect(() => {
         if (!userId) return;
 
@@ -137,7 +134,7 @@ export default function MyOrders() {
         channel.bind("order-updated", (data) => {
             setOrders((prev) =>
                 prev.map((o) =>
-                    o.id === data.orderId
+                    o._id === data.orderId
                         ? { ...o, status: data.status, paymentStatus: data.paymentStatus }
                         : o
                 )
