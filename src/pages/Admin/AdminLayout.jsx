@@ -4,6 +4,7 @@ import Sidebar from "../../components/Sidebar";
 import Topbar from "../../components/Topbar";
 import { API_BASE_URL, AUTH_BASE_URL, ORDERS_API_URL } from "../../data/mockData";
 import api from "../../config/axios";
+import pusherClient from "../../config/pusher";
 
 function normalizeCustomer(u) {
   return {
@@ -121,6 +122,25 @@ export default function AdminLayout() {
 
     loadAll();
     return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe("admin-orders");
+
+    channel.bind("order-updated", (data) => {
+      console.log("Pusher event received: in admin layout", data);
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === data.orderId
+            ? { ...o, status: data.status, paymentStatus: data.paymentStatus }
+            : o
+        )
+      );
+    });
+
+    return () => {
+      pusherClient.unsubscribe("admin-orders");
+    };
   }, []);
 
   return (

@@ -1,19 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import {
-    Package,
-    ChevronDown,
-    ChevronUp,
-    ShoppingBag,
-    Clock,
-    Boxes,
-    Truck,
-    CheckCircle2,
-    XCircle,
-    Receipt,
-    Wallet,
-    LifeBuoy,
-} from "lucide-react";
+import { Package, ChevronDown, ChevronUp, ShoppingBag, Clock, Boxes, Truck, CheckCircle2, XCircle, Receipt, Wallet, LifeBuoy, } from "lucide-react";
 import GlassCard from "../../components/GlassCard";
 import Pill from "../../components/Pill";
 import { statusStyle, paymentStatusStyle } from "../../utils/badgeStyles";
@@ -128,10 +115,26 @@ export default function MyOrders() {
 
     useEffect(() => {
         if (!userId) return;
+        console.log("Frontend userId:", userId);
+
+        pusherClient.connection.bind("connected", () => {
+            console.log("✅ Pusher connected");
+        });
+        pusherClient.connection.bind("error", (err) => {
+            console.log("❌ Pusher connection error:", err);
+        });
 
         const channel = pusherClient.subscribe(`user-${userId}`);
 
+        channel.bind("pusher:subscription_succeeded", () => {
+            console.log("✅ Subscribed to channel:", `user-${userId}`);
+        });
+        channel.bind("pusher:subscription_error", (err) => {
+            console.log("❌ Subscription error:", err);
+        });
+
         channel.bind("order-updated", (data) => {
+            console.log("📩 Event received:", data);
             setOrders((prev) =>
                 prev.map((o) =>
                     o._id === data.orderId
