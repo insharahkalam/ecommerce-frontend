@@ -11,6 +11,7 @@ import { ORDER_STATUSES, ORDERS_API_URL } from "../../data/mockData";
 import api from "../../config/axios";
 
 const PAYMENT_STATUSES = ["Pending", "Paid", "Failed"];
+const MENU_WIDTH = 224; // w-56
 
 export default function Order() {
   const { orders, setOrders } = useOutletContext();
@@ -31,27 +32,27 @@ export default function Order() {
   }
 
   const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
     return orders.filter((o) => {
       const matchesQuery =
-        o.id.toLowerCase().includes(query.toLowerCase()) ||
-        o.customer.toLowerCase().includes(query.toLowerCase());
+        !q || o.id.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q);
       const matchesStatus = statusFilter === "All" || o.status === statusFilter;
       return matchesQuery && matchesStatus;
     });
   }, [orders, query, statusFilter]);
 
-  // Menu button ki actual position nikal kar dropdown ko portal me fixed render karte hain,
-  // isse table ke overflow-x-auto wrapper me dropdown clip/overlap nahi hota (wahi wajah thi
-  // jis se badges "upar-neeche" ajeeb tarah se dikh rahe thay).
   function toggleMenu(id) {
-    if (openMenuId === id) {
-      setOpenMenuId(null);
-      return;
-    }
+    if (openMenuId === id) return setOpenMenuId(null);
     const btn = btnRefs.current[id];
     if (btn) {
       const rect = btn.getBoundingClientRect();
-      setMenuPos({ top: rect.bottom + 6, left: rect.right - 208 }); // 208 = menu width (w-52)
+      const left = Math.min(
+        Math.max(rect.right - MENU_WIDTH, 8),
+        window.innerWidth - MENU_WIDTH - 8
+      );
+      const top =
+        rect.bottom + 340 > window.innerHeight ? Math.max(rect.top - 340, 8) : rect.bottom + 6;
+      setMenuPos({ top, left });
     }
     setOpenMenuId(id);
   }
@@ -59,18 +60,22 @@ export default function Order() {
   useEffect(() => {
     if (!openMenuId) return;
     function handleOutside(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target) && !btnRefs.current[openMenuId]?.contains(e.target)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target) &&
+        !btnRefs.current[openMenuId]?.contains(e.target)
+      ) {
         setOpenMenuId(null);
       }
     }
-    function handleScroll() {
-      setOpenMenuId(null);
-    }
+    const close = () => setOpenMenuId(null);
     document.addEventListener("mousedown", handleOutside);
-    window.addEventListener("scroll", handleScroll, true);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
     return () => {
       document.removeEventListener("mousedown", handleOutside);
-      window.removeEventListener("scroll", handleScroll, true);
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
     };
   }, [openMenuId]);
 
@@ -88,7 +93,7 @@ export default function Order() {
     try {
       await api.put(`${ORDERS_API_URL}/update-status/${id}`, { status });
       showToast(`Order marked ${status}.`);
-    } catch (err) {
+    } catch {
       setOrders(prev);
       showToast("Could not update order — server unreachable.", "error");
     }
@@ -101,7 +106,7 @@ export default function Order() {
     try {
       await api.put(`${ORDERS_API_URL}/update-status/${id}`, { paymentStatus });
       showToast(`Payment marked ${paymentStatus}.`);
-    } catch (err) {
+    } catch {
       setOrders(prev);
       showToast("Could not update payment — server unreachable.", "error");
     }
@@ -114,56 +119,117 @@ export default function Order() {
     try {
       await api.delete(`${ORDERS_API_URL}/delete-order/${id}`);
       showToast("Order deleted.");
-    } catch (err) {
+    } catch {
       setOrders(prev);
       showToast("Could not delete — server unreachable.", "error");
     }
   }
 
+  const th = "py-3 px-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500";
+  const td = "py-3.5 px-4 align-middle";
+
   return (
-    <>
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="font-display italic text-2xl font-semibold tracking-tight text-white">Orders</h1>
-          <p className="text-sm mt-1 text-neutral-400 font-serif">{orders.length} total orders</p>
+    <div className="flex flex-col gap-5">
+      {/* Header */}
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">
+            Orders
+          </h1>
+          <p className="mt-1 text-sm text-neutral-400">
+            {orders.length} total · {filtered.length} shown
+          </p>
+        </div>
+      </header>
+
+      {/* Toolbar */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="w-full lg:max-w-sm">
+          <SearchInput value={query} onChange={setQuery} placeholder="Search order ID or customer…" />
+        </div>
+        <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 lg:overflow-visible lg:pb-0">
+          <Filter size={14} className="shrink-0 text-neutral-500" />
+          {["All", ...ORDER_STATUSES].map((s) => {
+            const active = statusFilter === s;
+            return (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${active
+                  ? "border-orange-500/30 bg-orange-500/15 text-orange-300"
+                  : "border-white/10 text-neutral-400 hover:border-white/20 hover:text-neutral-200"
+                  }`}
+              >
+                {s}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap">
-        <SearchInput value={query} onChange={setQuery} placeholder="Search order ID or customer…" />
-        <div className="flex items-center gap-2 flex-wrap">
-          <Filter size={14} color="#A3A3A3" />
-          {["All", ...ORDER_STATUSES].map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className="px-3 py-1.5 rounded-lg text-xs font-serif border transition-colors"
-              style={{
-                background: statusFilter === s ? "rgba(249,115,22,0.14)" : "transparent",
-                color: statusFilter === s ? "#FB923C" : "#A3A3A3",
-                borderColor: statusFilter === s ? "rgba(249,115,22,0.3)" : "rgba(255,255,255,0.1)",
-              }}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+      {/* Mobile cards */}
+      <div className="flex flex-col gap-3 lg:hidden">
+        {filtered.map((o) => {
+          const s = statusStyle(o.status);
+          const ps = paymentStatusStyle(o.paymentStatus);
+          return (
+            <GlassCard key={o.id}>
+              <div className="flex flex-col gap-3 p-4">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                  <div className="min-w-0">
+                    <button
+                      onClick={() => setViewingOrder(o)}
+                      className="flex items-center gap-1.5 font-mono text-sm text-white transition-colors hover:text-orange-400"
+                    >
+                      <Eye size={13} className="shrink-0" /> #{o.id.slice(-8)}
+                    </button>
+                    <p className="mt-1 truncate text-sm text-neutral-300">{o.customer}</p>
+                    <p className="mt-0.5 font-mono text-xs text-neutral-500">{o.date}</p>
+                  </div>
+                  <button
+                    ref={(el) => (btnRefs.current[o.id] = el)}
+                    onClick={() => toggleMenu(o.id)}
+                    className="shrink-0 rounded-md p-1.5 text-neutral-400 transition-colors hover:bg-white/5 hover:text-white"
+                    aria-label="Order actions"
+                  >
+                    <MoreHorizontal size={16} />
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill>
+                  <Pill color={ps.color} bg={ps.bg} border={ps.border}>{o.paymentStatus}</Pill>
+                  <span className="text-xs text-neutral-500">{o.paymentMethod}</span>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/10 pt-3">
+                  <span className="font-mono text-xs text-neutral-400">{o.items} items</span>
+                  <span className="font-mono text-base text-white">${o.total.toFixed(2)}</span>
+                </div>
+              </div>
+            </GlassCard>
+          );
+        })}
+        {filtered.length === 0 && (
+          <GlassCard>
+            <p className="py-10 text-center text-sm text-neutral-500">No orders match your search.</p>
+          </GlassCard>
+        )}
       </div>
 
-      <GlassCard>
-        <div className="p-5">
-          <div className="overflow-x-auto scrollbar-thin">
-            <table className="w-full text-sm border-separate" style={{ borderSpacing: "0 2px" }}>
+      {/* Desktop table */}
+      <div className="hidden lg:block">
+        <GlassCard>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-sm">
               <thead>
-                <tr className="text-left text-neutral-500">
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Order</th>
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Customer</th>
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Items</th>
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Total</th>
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Payment</th>
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Status</th>
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Date</th>
-                  <th className="py-2"></th>
+                <tr className="border-b border-white/10 text-left">
+                  <th className={th}>Order</th>
+                  <th className={th}>Customer</th>
+                  <th className={th}>Items</th>
+                  <th className={th}>Total</th>
+                  <th className={th}>Payment</th>
+                  <th className={th}>Status</th>
+                  <th className={th}>Date</th>
+                  <th className={`${th} text-right`}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -171,85 +237,104 @@ export default function Order() {
                   const s = statusStyle(o.status);
                   const ps = paymentStatusStyle(o.paymentStatus);
                   return (
-                    <tr key={o.id} className="border-t border-white/10 align-middle">
-                      <td className="py-3 align-middle font-mono text-white whitespace-nowrap">
-                        <button onClick={() => setViewingOrder(o)} className="flex items-center gap-1.5 hover:text-orange-400 transition-colors">
+                    <tr
+                      key={o.id}
+                      className="border-b border-white/[0.06] transition-colors last:border-0 hover:bg-white/[0.03]"
+                    >
+                      <td className={`${td} whitespace-nowrap font-mono text-white`}>
+                        <button
+                          onClick={() => setViewingOrder(o)}
+                          className="flex items-center gap-1.5 transition-colors hover:text-orange-400"
+                        >
                           <Eye size={12} /> {o.id.slice(-8)}
                         </button>
                       </td>
-                      <td className="py-3 align-middle font-serif text-white whitespace-nowrap">{o.customer}</td>
-                      <td className="py-3 align-middle font-mono text-neutral-400">{o.items}</td>
-                      <td className="py-3 align-middle font-mono text-white whitespace-nowrap">${o.total.toFixed(2)}</td>
-                      <td className="py-3 align-middle">
+                      <td className={`${td} max-w-[200px] truncate text-neutral-200`}>{o.customer}</td>
+                      <td className={`${td} font-mono text-neutral-400`}>{o.items}</td>
+                      <td className={`${td} whitespace-nowrap font-mono text-white`}>
+                        ${o.total.toFixed(2)}
+                      </td>
+                      <td className={td}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
-                          <span className="font-serif text-xs text-neutral-400">{o.paymentMethod}</span>
+                          <span className="text-xs text-neutral-400">{o.paymentMethod}</span>
                           <Pill color={ps.color} bg={ps.bg} border={ps.border}>{o.paymentStatus}</Pill>
                         </div>
                       </td>
-                      <td className="py-3 align-middle whitespace-nowrap">
+                      <td className={`${td} whitespace-nowrap`}>
                         <Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill>
                       </td>
-                      <td className="py-3 align-middle font-mono text-neutral-500 whitespace-nowrap">{o.date}</td>
-                      <td className="py-3 align-middle text-right">
+                      <td className={`${td} whitespace-nowrap font-mono text-xs text-neutral-500`}>
+                        {o.date}
+                      </td>
+                      <td className={`${td} text-right`}>
                         <button
                           ref={(el) => (btnRefs.current[o.id] = el)}
                           onClick={() => toggleMenu(o.id)}
-                          className="p-1 rounded hover:bg-white/5 transition-colors"
+                          className="rounded-md p-1.5 text-neutral-400 transition-colors hover:bg-white/5 hover:text-white"
+                          aria-label="Order actions"
                         >
-                          <MoreHorizontal size={16} color="#A3A3A3" />
+                          <MoreHorizontal size={16} />
                         </button>
                       </td>
                     </tr>
                   );
                 })}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="py-8 text-center text-neutral-500 font-serif text-sm">No orders match your search.</td></tr>
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-sm text-neutral-500">
+                      No orders match your search.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
-        </div>
-      </GlassCard>
+        </GlassCard>
+      </div>
 
-      {/* Dropdown menu — portal se render hota hai isliye table scroll/overflow me clip nahi hota */}
+      {/* Action menu (portal so it never clips inside the scroll container) */}
       {openMenuId &&
         createPortal(
           <div
             ref={menuRef}
-            className="fixed z-[999] w-52 rounded-lg border border-white/10 bg-neutral-900 shadow-xl overflow-hidden"
-            style={{ top: menuPos.top, left: Math.max(menuPos.left, 8) }}
+            className="fixed z-[999] w-56 overflow-hidden rounded-xl border border-white/10 bg-neutral-900/95 shadow-2xl shadow-black/50 backdrop-blur-xl"
+            style={{ top: menuPos.top, left: menuPos.left }}
           >
-            <p className="px-3 pt-2 pb-1 text-[10px] font-serif uppercase tracking-wide text-neutral-600">Order status</p>
+            <p className="px-3 pt-2.5 pb-1 text-[10px] uppercase tracking-wider text-neutral-500">
+              Order status
+            </p>
             {ORDER_STATUSES.map((s2) => {
               const o = orders.find((x) => x.id === openMenuId);
               return (
                 <button
                   key={s2}
                   onClick={() => updateStatus(openMenuId, s2)}
-                  className="w-full text-left px-3 py-2 text-xs font-serif text-neutral-300 hover:bg-white/5 flex items-center justify-between"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-neutral-300 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   Mark {s2}
-                  {o?.status === s2 && <Check size={12} color="#FB923C" />}
+                  {o?.status === s2 && <Check size={12} className="text-orange-400" />}
                 </button>
               );
             })}
-            <p className="px-3 pt-2 pb-1 text-[10px] font-serif uppercase tracking-wide text-neutral-600 border-t border-white/10">Payment status</p>
+            <p className="border-t border-white/10 px-3 pt-2.5 pb-1 text-[10px] uppercase tracking-wider text-neutral-500">
+              Payment status
+            </p>
             {PAYMENT_STATUSES.map((p2) => {
               const o = orders.find((x) => x.id === openMenuId);
               return (
                 <button
                   key={p2}
                   onClick={() => updatePaymentStatus(openMenuId, p2)}
-                  className="w-full text-left px-3 py-2 text-xs font-serif text-neutral-300 hover:bg-white/5 flex items-center justify-between"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-neutral-300 transition-colors hover:bg-white/5 hover:text-white"
                 >
                   Mark {p2}
-                  {o?.paymentStatus === p2 && <Check size={12} color="#FB923C" />}
+                  {o?.paymentStatus === p2 && <Check size={12} className="text-orange-400" />}
                 </button>
               );
             })}
             <button
               onClick={() => removeOrder(openMenuId)}
-              className="w-full text-left px-3 py-2 text-xs font-serif text-red-400 hover:bg-white/5 flex items-center gap-1.5 border-t border-white/10"
+              className="flex w-full items-center gap-1.5 border-t border-white/10 px-3 py-2.5 text-left text-xs text-red-400 transition-colors hover:bg-red-500/10"
             >
               <Trash2 size={12} /> Delete order
             </button>
@@ -257,6 +342,7 @@ export default function Order() {
           document.body
         )}
 
+      {/* Detail modal */}
       {viewingOrder && (
         <Modal
           title={`Order #${viewingOrder.id.slice(-8)}`}
@@ -265,154 +351,198 @@ export default function Order() {
             setReceiptZoom(false);
           }}
         >
-          <div className="flex flex-col gap-4">
-            <div>
-              <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Items</p>
+          <div className="flex max-h-[75vh] flex-col gap-4 ">
+            <section>
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-neutral-500">Items</p>
               <div className="flex flex-col gap-2">
                 {viewingOrder.rawItems.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg border border-white/10 bg-white/[0.03]">
-                    <div className="flex items-center gap-2">
-                      {item.image && <img src={item.image} alt={item.title} className="w-8 h-8 rounded-md object-cover" />}
-                      <div>
-                        <p className="text-sm font-serif text-white">{item.title}</p>
-                        <p className="text-xs font-mono text-neutral-500">Qty {item.quantity} · ${item.price.toFixed(2)}</p>
+                  <div
+                    key={i}
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+                  >
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="h-9 w-9 shrink-0 rounded-lg object-cover"
+                        />
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm text-white">{item.title}</p>
+                        <p className="font-mono text-xs text-neutral-500">
+                          Qty {item.quantity} · ${item.price.toFixed(2)}
+                        </p>
                       </div>
                     </div>
-                    <span className="font-mono text-sm text-white">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="shrink-0 font-mono text-sm text-white">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
 
-            <div>
-              <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Shipping address</p>
-              <div className="px-3 py-2.5 rounded-lg border border-white/10 bg-white/[0.03] text-sm font-serif text-neutral-300">
-                <p className="text-white">{viewingOrder.shippingAddress.fullName}</p>
-                <p>{viewingOrder.shippingAddress.phone}</p>
-                <p>{viewingOrder.shippingAddress.address}, {viewingOrder.shippingAddress.city}</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Payment</p>
-              <div className="px-3 py-2.5 rounded-lg border border-white/10 bg-white/[0.03] text-sm font-serif text-neutral-300 flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span>Method:</span> <span className="text-white">{viewingOrder.paymentMethod}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>Status:</span>
-                  {(() => {
-                    const ps = paymentStatusStyle(viewingOrder.paymentStatus);
-                    return <Pill color={ps.color} bg={ps.bg} border={ps.border}>{viewingOrder.paymentStatus}</Pill>;
-                  })()}
-                </div>
-
-                {viewingOrder.transferDetails?.transactionId && (
-                  <>
-                    <p>Transaction ID: <span className="text-white font-mono">{viewingOrder.transferDetails.transactionId}</span></p>
-                    {viewingOrder.transferDetails.bankName && (
-                      <p>Bank: <span className="text-white">{viewingOrder.transferDetails.bankName}</span></p>
-                    )}
-                    {viewingOrder.transferDetails.accountTitle && (
-                      <p>Account Title: <span className="text-white">{viewingOrder.transferDetails.accountTitle}</span></p>
-                    )}
-                    {viewingOrder.transferDetails.accountNumber && (
-                      <p>Account No: <span className="text-white font-mono">{viewingOrder.transferDetails.accountNumber}</span></p>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Payment receipt — admin yahan se verify karega */}
-            {(viewingOrder.paymentMethod === "Bank Transfer" || viewingOrder.paymentMethod === "Easypaisa") && (
+            <section className="grid gap-4">
               <div>
-                <p className="text-xs font-serif uppercase tracking-wide text-neutral-500 mb-1.5">Payment receipt</p>
-                {viewingOrder.transferDetails?.receiptImage ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setReceiptZoom(true)}
-                      className="block w-full rounded-lg overflow-hidden border border-white/10 hover:border-orange-500/40 transition-colors"
-                    >
-                      <img
-                        src={viewingOrder.transferDetails.receiptImage}
-                        alt="Payment receipt"
-                        className="w-full max-h-64 object-contain bg-black/30"
-                      />
-                    </button>
-                    <p className="text-[11px] font-serif text-neutral-600 mt-1">Click the receipt to view full size.</p>
-
-                    {viewingOrder.paymentStatus === "Pending" && (
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={() => updatePaymentStatus(viewingOrder.id, "Paid")}
-                          className="flex-1 px-3 py-2 rounded-lg text-xs font-serif border border-green-500/30 bg-green-500/10 text-green-300 hover:bg-green-500/15 transition-colors flex items-center justify-center gap-1.5"
-                        >
-                          <Check size={12} /> Verify & mark Paid
-                        </button>
-                        <button
-                          onClick={() => updatePaymentStatus(viewingOrder.id, "Failed")}
-                          className="flex-1 px-3 py-2 rounded-lg text-xs font-serif border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/15 transition-colors flex items-center justify-center gap-1.5"
-                        >
-                          <X size={12} /> Reject
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex items-center gap-2 px-3 py-4 rounded-lg border border-dashed border-white/10 text-neutral-500 text-xs font-serif justify-center">
-                    <ImageOff size={14} /> No receipt uploaded
-                  </div>
-                )}
+                <p className="mb-2 text-[11px] font-serif uppercase tracking-wider text-neutral-500">
+                  Shipping address
+                </p>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 flex flex-col gap-1.5">
+                  <p className="font-mono text-xs text-neutral-500">
+                    Name: <span className="text-neutral-200">{viewingOrder.shippingAddress.fullName}</span>
+                  </p>
+                  <p className="font-mono text-xs text-neutral-500">
+                    Contact: <span className="text-neutral-200">{viewingOrder.shippingAddress.phone}</span>
+                  </p>
+                  <p className="font-mono text-xs text-neutral-500 leading-relaxed">
+                    Address: <span className="text-neutral-300 font-serif">{viewingOrder.shippingAddress.address}, {viewingOrder.shippingAddress.city}</span>
+                  </p>
+                </div>
               </div>
-            )}
 
-            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-orange-500/25 bg-orange-500/10">
-              <span className="text-sm font-serif text-orange-300">Total</span>
-              <span className="font-mono text-lg text-white">${viewingOrder.total.toFixed(2)}</span>
+              <div>
+                <p className="mb-2 text-[11px] uppercase tracking-wider text-neutral-500">Payment</p>
+                <div className="flex flex-col gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-neutral-300">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span>Method:</span>
+                    <span className="text-white">{viewingOrder.paymentMethod}</span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span>Status:</span>
+                    {(() => {
+                      const ps = paymentStatusStyle(viewingOrder.paymentStatus);
+                      return (
+                        <Pill color={ps.color} bg={ps.bg} border={ps.border}>
+                          {viewingOrder.paymentStatus}
+                        </Pill>
+                      );
+                    })()}
+                  </div>
+                  {viewingOrder.transferDetails?.transactionId && (
+                    <>
+                      <p className="break-all">
+                        Transaction ID:{" "}
+                        <span className="font-mono text-white">
+                          {viewingOrder.transferDetails.transactionId}
+                        </span>
+                      </p>
+                      {viewingOrder.transferDetails.bankName && (
+                        <p>Bank: <span className="text-white">{viewingOrder.transferDetails.bankName}</span></p>
+                      )}
+                      {viewingOrder.transferDetails.accountTitle && (
+                        <p>Account Title: <span className="text-white">{viewingOrder.transferDetails.accountTitle}</span></p>
+                      )}
+                      {viewingOrder.transferDetails.accountNumber && (
+                        <p className="break-all">
+                          Account No:{" "}
+                          <span className="font-mono text-white">
+                            {viewingOrder.transferDetails.accountNumber}
+                          </span>
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {(viewingOrder.paymentMethod === "Bank Transfer" ||
+              viewingOrder.paymentMethod === "Easypaisa") && (
+                <section>
+                  <p className="mb-2 text-[11px] uppercase tracking-wider text-neutral-500">
+                    Payment receipt
+                  </p>
+                  {viewingOrder.transferDetails?.receiptImage ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setReceiptZoom(true)}
+                        className="block w-full overflow-hidden rounded-xl border border-white/10 transition-colors hover:border-orange-500/40"
+                      >
+                        <img
+                          src={viewingOrder.transferDetails.receiptImage}
+                          alt="Payment receipt"
+                          className="max-h-56 w-full bg-black/30 object-contain sm:max-h-72"
+                        />
+                      </button>
+                      <p className="mt-1.5 text-[11px] text-neutral-500">
+                        Tap the receipt to view full size.
+                      </p>
+                      {viewingOrder.paymentStatus === "Pending" && (
+                        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                          <button
+                            onClick={() => updatePaymentStatus(viewingOrder.id, "Paid")}
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2.5 text-xs font-medium text-green-300 transition-colors hover:bg-green-500/20"
+                          >
+                            <Check size={12} /> Verify & mark Paid
+                          </button>
+                          <button
+                            onClick={() => updatePaymentStatus(viewingOrder.id, "Failed")}
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/20"
+                          >
+                            <X size={12} /> Reject
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/10 px-3 py-6 text-xs text-neutral-500">
+                      <ImageOff size={14} /> No receipt uploaded
+                    </div>
+                  )}
+                </section>
+              )}
+
+            <div className="flex items-center justify-between rounded-xl border border-orange-500/25 bg-orange-500/10 px-4 py-3">
+              <span className="text-sm font-serif tracking-wide text-orange-300">Total Amount</span>
+              <span className="font-serif text-xl font-semibold text-white">
+                ${viewingOrder.total.toFixed(2)}
+              </span>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* Receipt full-size lightbox */}
+      {/* Receipt lightbox */}
       {receiptZoom &&
         viewingOrder?.transferDetails?.receiptImage &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center p-6"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 sm:p-8"
             onClick={() => setReceiptZoom(false)}
           >
             <button
               onClick={() => setReceiptZoom(false)}
-              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+              aria-label="Close"
             >
               <X size={18} />
             </button>
             <img
               src={viewingOrder.transferDetails.receiptImage}
               alt="Payment receipt full size"
-              className="max-w-full max-h-full rounded-lg object-contain"
+              className="max-h-full max-w-full rounded-xl object-contain"
               onClick={(e) => e.stopPropagation()}
             />
           </div>,
           document.body
         )}
 
+      {/* Toast */}
       {toast && (
-        <div className="fixed top-5 right-5 z-[999]">
+        <div className="fixed inset-x-4 top-4 z-[999] sm:inset-x-auto sm:right-5 sm:top-5">
           <div
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg border shadow-xl shadow-black/40 text-sm font-serif backdrop-blur-xl ${toast.type === "error"
-              ? "border-red-500/25 bg-red-500/10 text-red-300"
-              : "border-orange-500/25 bg-orange-500/10 text-orange-300"
+            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm shadow-xl shadow-black/40 backdrop-blur-xl ${toast.type === "error"
+              ? "border-red-500/25 bg-red-500/15 text-red-300"
+              : "border-green-500/25 bg-green-500/15 text-green-300"
               }`}
           >
-            {toast.type === "error" ? <X size={16} /> : <Check size={16} />}
+            {toast.type === "error" ? <X size={16} className="shrink-0" /> : <Check size={16} className="shrink-0" />}
             <span>{toast.message}</span>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

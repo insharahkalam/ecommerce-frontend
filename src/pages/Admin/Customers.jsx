@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useOutletContext } from "react-router-dom";
 import { Mail, Phone, Trash2, Plus } from "lucide-react";
 import GlassCard from "../../components/GlassCard";
@@ -8,13 +8,34 @@ import Modal from "../../components/Modal";
 import { FieldLabel, TextField } from "../../components/FormFields";
 
 export default function Customers() {
-  const { customers, setCustomers } = useOutletContext();
+  const { customers, setCustomers, orders } = useOutletContext();
   const [query, setQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
-  const filtered = customers.filter(
-    (c) => c.name.toLowerCase().includes(query.toLowerCase()) || c.email.toLowerCase().includes(query.toLowerCase())
+  const mergedCustomers = useMemo(() => {
+    return customers.map((c) => {
+      const customerOrders = orders.filter(
+        (o) => o.email?.toLowerCase() === c.email?.toLowerCase()
+      );
+
+      const spent = customerOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+      const phone = customerOrders[0]?.shippingAddress?.phone || "—";
+
+      return {
+        ...c,
+        orders: customerOrders.length,
+        spent,
+        phone,
+      };
+    });
+  }, [customers, orders]);
+
+  const filtered = mergedCustomers.filter(
+    (c) =>
+      c.name.toLowerCase().includes(query.toLowerCase()) ||
+      c.email.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
@@ -34,7 +55,7 @@ export default function Customers() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-neutral-500">
-                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Customer</th>
+                  <th className="py-2 font-serif text-xs uppercase tracking-wide">Customers</th>
                   <th className="py-2 font-serif text-xs uppercase tracking-wide">Contact</th>
                   <th className="py-2 font-serif text-xs uppercase tracking-wide">Orders</th>
                   <th className="py-2 font-serif text-xs uppercase tracking-wide">Spent</th>
@@ -57,14 +78,14 @@ export default function Customers() {
                       </div>
                     </td>
                     <td className="py-3">
-                      <div className="flex items-center gap-1.5 text-neutral-400 font-serif text-xs">
-                        <Mail size={12} /> {c.email}
-                      </div>
-                      {c.phone && (
-                        <div className="flex items-center gap-1.5 text-neutral-500 font-mono text-xs mt-0.5">
+                      <div className="flex flex-col gap-1 text-neutral-400 font-serif text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <Mail size={12} /> {c.email}
+                        </div>
+                        <div className="flex items-center gap-1.5">
                           <Phone size={12} /> {c.phone}
                         </div>
-                      )}
+                      </div>
                     </td>
                     <td className="py-3 font-mono text-neutral-300">{c.orders}</td>
                     <td className="py-3 font-mono text-white">${c.spent.toFixed(2)}</td>

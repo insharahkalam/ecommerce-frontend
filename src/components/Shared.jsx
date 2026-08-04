@@ -1,10 +1,8 @@
+import logos from '../assets/urbans.png'
 export function Logo() {
     return (
         <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center text-black font-bold text-sm">
-                !
-            </div>
-            <span className="text-white  font-serif font-semibold text-xl">Apna Bazar</span>
+            <img width={250} height={20} src={logos} alt="" />
         </div>
     );
 }

@@ -1,15 +1,14 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Plus } from "lucide-react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
-} from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import GlassCard from "../../components/GlassCard";
 import StatCard from "../../components/StatCard";
 import Pill from "../../components/Pill";
 import PrimaryButton from "../../components/PrimaryButton";
 import { statusStyle } from "../../utils/badgeStyles";
 import { revenueData } from "../../data/mockData";
+import { calculateDelta } from "../../utils/calculateDelta";
 
 export default function AdminDashboard() {
   const { orders, products, customers } = useOutletContext();
@@ -17,6 +16,15 @@ export default function AdminDashboard() {
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
   const topProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 4);
   const recentOrders = orders.slice(0, 6);
+
+  // Real deltas — last 30 din vs pichle 30 din, id (Mongo _id) se date nikal ke calculate
+  const revenueDelta = useMemo(
+    () => calculateDelta(orders, (o) => o.total || 0, 30),
+    [orders]
+  );
+  const ordersDelta = useMemo(() => calculateDelta(orders, () => 1, 30), [orders]);
+  const customersDelta = useMemo(() => calculateDelta(customers, () => 1, 30), [customers]);
+  const productsDelta = useMemo(() => calculateDelta(products, () => 1, 30), [products]);
 
   return (
     <>
@@ -31,10 +39,16 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard label="Revenue" value={totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })} prefix="$" delta="12.4%" positive />
-        <StatCard label="Orders" value={orders.length} delta="6.1%" positive />
-        <StatCard label="Customers" value={customers.length} delta="2.3%" positive />
-        <StatCard label="Avg. order value" value={(totalRevenue / Math.max(orders.length, 1)).toFixed(2)} prefix="$" delta="4.7%" positive />
+        <StatCard
+          label="Revenue"
+          value={totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          prefix="$"
+          delta={revenueDelta.delta}
+          positive={revenueDelta.positive}
+        />
+        <StatCard label="Orders" value={orders.length} delta={ordersDelta.delta} positive={ordersDelta.positive} />
+        <StatCard label="Customers" value={customers.length} delta={customersDelta.delta} positive={customersDelta.positive} />
+        <StatCard label="Products" value={products.length} delta={productsDelta.delta} positive={productsDelta.positive} />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -42,7 +56,9 @@ export default function AdminDashboard() {
           <div className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display italic text-base font-semibold text-white">Revenue this week</h2>
-              <span className="font-mono text-xs px-2 py-1 rounded border border-orange-500/25 bg-orange-500/10 text-orange-400">+12.4%</span>
+              <span className="font-mono text-xs px-2 py-1 rounded border border-orange-500/25 bg-orange-500/10 text-orange-400">
+                {revenueDelta.positive ? "+" : "-"}{revenueDelta.delta}
+              </span>
             </div>
             <ResponsiveContainer width="100%" height={240}>
               <AreaChart data={revenueData} margin={{ left: -20, right: 10, top: 10 }}>
