@@ -87,8 +87,8 @@ export default function AdminLayout() {
       try {
         const res = await api.get(`${ORDERS_API_URL}/getAllOrders`);
         console.log(res, "order res check");
-
-        const list = res.data || [];
+        const data = res.data
+        const list = data.order || [];
         console.log(list, "get all orders=====>");
 
         if (!cancelled) setOrders(list.map(normalizeOrder));

@@ -154,10 +154,10 @@ export default function MyOrders() {
         let cancelled = false;
         async function load() {
             try {
-                const res = await api.get(`${ORDERS_API_URL}/my-orders`);
-                if (!cancelled) setOrders(res.data.orders || []);
+                const res = await api.get(`${ORDERS_API_URL}/myOrders`);
+                if (!cancelled) setOrders(res.data.order || []);
             } catch (err) {
-                console.error("Failed to load orders:", err);
+                console.error("Failed to load orders:", err.message);
             } finally {
                 if (!cancelled) setLoading(false);
             }
