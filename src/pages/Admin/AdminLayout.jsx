@@ -74,7 +74,7 @@ export default function AdminLayout() {
 
       try {
         const res = await api.get(`${API_BASE_URL}/getAllProduct`);
-        console.log(res, "check res get");
+        console.log(res, "check res getproduct");
 
         const data = res.data;
         const list = data.getProduct || [];
@@ -88,12 +88,13 @@ export default function AdminLayout() {
         const res = await api.get(`${ORDERS_API_URL}/getAllOrders`);
         console.log(res, "order res check");
 
-        const data = res.data;
-        const list = data.orders || [];
+        const list = res.data || [];
+        console.log(list, "get all orders=====>");
+
         if (!cancelled) setOrders(list.map(normalizeOrder));
       } catch (err) {
-        console.error("Failed to load orders:", err);
-        errors.push("orders");
+        console.error("Failed to load orders:", err.message);
+        errors.push("order");
       }
 
       try {
