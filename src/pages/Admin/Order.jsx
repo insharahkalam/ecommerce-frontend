@@ -86,18 +86,45 @@ export default function Order() {
     }
   }, [orders]);
 
+  // async function updateStatus(id, status) {
+  //   const prev = orders;
+  //   setOrders((p) => p.map((o) => (o.id === id ? { ...o, status } : o)));
+  //   setOpenMenuId(null);
+  //   try {
+  //     await api.put(`${ORDERS_API_URL}/update-status/${id}`, { status });
+  //     showToast(`Order marked ${status}.`);
+  //   } catch {
+  //     setOrders(prev);
+  //     showToast("Could not update order — server unreachable.", "error");
+  //   }
+  // }
+
   async function updateStatus(id, status) {
+    // Cancel karne se backend automatically stock wapas add kar deta hai — confirm le lo
+    if (status === "Cancelled") {
+      const confirmed = window.confirm(
+        "Cancel karne se is order ke items ka stock automatically wapas add ho jayega. Continue karein?"
+      );
+      if (!confirmed) {
+        setOpenMenuId(null);
+        return;
+      }
+    }
+
     const prev = orders;
     setOrders((p) => p.map((o) => (o.id === id ? { ...o, status } : o)));
     setOpenMenuId(null);
     try {
       await api.put(`${ORDERS_API_URL}/update-status/${id}`, { status });
-      showToast(`Order marked ${status}.`);
+      showToast(
+        status === "Cancelled" ? "Order cancelled — stock restored." : `Order marked ${status}.`
+      );
     } catch {
       setOrders(prev);
       showToast("Could not update order — server unreachable.", "error");
     }
   }
+
 
   async function updatePaymentStatus(id, paymentStatus) {
     const prev = orders;
