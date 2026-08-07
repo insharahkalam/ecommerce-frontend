@@ -16,6 +16,7 @@ function normalize(p) {
         featured: !!p.featured,
         image: p.image,
         category: p.category || "uncategorized",
+        sold: Number(p.sold) || 0,
     };
 }
 
