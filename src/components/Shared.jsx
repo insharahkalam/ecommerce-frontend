@@ -5,14 +5,14 @@ export function Logo() {
 
         <Link className="group flex shrink-0 items-center gap-3">
             {/* Logo badge with a clean inner plate so the logo stays visible */}
-            <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 p-[2px] shadow-[0_6px_20px_-6px_rgba(249,115,22,0.85)] transition-all duration-300 group-hover:shadow-[0_10px_28px_-10px_rgba(249,115,22,0.95)] group-hover:-rotate-3 group-hover:scale-105">
-                <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-white">
+            <span className="relative flex h-18 w-18 shrink-0 items-center justify-center rounded-[14px]">
+                <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[12px]">
                     <img
                         src={logo}
                         alt="UrbanTraders"
-                        width={40}
-                        height={40}
-                        className="h-7 w-7 object-contain"
+                        width={80}
+                        height={80}
+                        className="h-15 w-15 object-contain"
                     />
                 </span>
             </span>

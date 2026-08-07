@@ -112,7 +112,7 @@ export default function ProductDetail() {
                     <GlassCard>
                         <div className="grid grid-cols-3 divide-x divide-white/10">
                             {[
-                                { icon: Truck, label: "Free shipping" },
+                                { icon: Truck, label: "Fast Delivery" },
                                 { icon: Shield, label: "Secure pay" },
                                 { icon: RotateCcw, label: "30-day returns" },
                             ].map((I) => (

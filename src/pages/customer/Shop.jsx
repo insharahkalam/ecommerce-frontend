@@ -106,7 +106,7 @@ export default function Shop() {
                 {/* Trust strip */}
                 <div className="mt-4 grid grid-cols-3 gap-3">
                     {[
-                        { icon: Truck, label: "Free shipping" },
+                        { icon: Truck, label: "Fast Delivery" },
                         { icon: RotateCcw, label: "7-day returns" },
                         { icon: ShieldCheck, label: "Secure payment" },
                     ].map(({ icon: Icon, label }) => (

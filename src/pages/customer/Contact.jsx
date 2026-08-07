@@ -13,9 +13,8 @@ export default function Contact() {
     }
 
     const info = [
-        { icon: Mail, label: "Email", value: "hello@apnabazar.com" },
-        { icon: Phone, label: "Phone", value: "+92 300 1234567" },
-        { icon: MapPin, label: "Address", value: "Karachi, Pakistan" },
+        { icon: Mail, label: "Email", value: "urbantraders036@gmail.com" },
+        { icon: MapPin, label: "Address", value: "Pakpattan, Pakistan" },
     ];
 
     return (
