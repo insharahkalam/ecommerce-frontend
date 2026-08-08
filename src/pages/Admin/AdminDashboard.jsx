@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const { orders, products, customers } = useOutletContext();
   const navigate = useNavigate();
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
-  const topProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 4);
+  const topProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 5);
   const recentOrders = orders.slice(0, 6);
 
   // Real deltas — last 30 din vs pichle 30 din, id (Mongo _id) se date nikal ke calculate
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
         <StatCard
           label="Revenue"
           value={totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-          prefix="$"
+          prefix="Rs "
           delta={revenueDelta.delta}
           positive={revenueDelta.positive}
         />
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
                 <Tooltip
                   contentStyle={{ borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "#0a0a0a", fontSize: 12, fontFamily: "'JetBrains Mono',monospace" }}
                   labelStyle={{ color: "#fff" }}
-                  formatter={(value, name) => [name === "revenue" ? `$${value}` : value, name === "revenue" ? "Revenue" : "Orders"]}
+                  formatter={(value, name) => [name === "revenue" ? `Rs ${value}` : value, name === "revenue" ? "Revenue" : "Orders"]}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#F97316" strokeWidth={2} fill="url(#rev)" />
               </AreaChart>
@@ -95,9 +95,9 @@ export default function AdminDashboard() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-serif text-white truncate">{p.name}</p>
-                  <p className="font-mono text-xs text-neutral-500">{p.id} · {p.sold} sold</p>
+                  <p className="font-mono text-xs text-neutral-500">{p.id} </p>
                 </div>
-                <span className="font-mono text-sm text-white">${(p.sold * p.price).toLocaleString()}</span>
+                <span className="font-serif text-xs text-white"> {p.sold} sold</span>
               </div>
             ))}
           </div>
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                       <td className="py-3 font-mono text-white">{o.id}</td>
                       <td className="py-3 font-serif text-white">{o.customer}</td>
                       <td className="py-3 font-mono text-neutral-400">{o.items}</td>
-                      <td className="py-3 font-mono text-white">${o.total.toFixed(2)}</td>
+                      <td className="py-3 font-mono text-white">Rs {o.total.toFixed(2)}</td>
                       <td className="py-3"><Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill></td>
                       <td className="py-3 font-mono text-neutral-500">{o.date}</td>
                     </tr>

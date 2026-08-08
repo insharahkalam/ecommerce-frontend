@@ -102,7 +102,7 @@ export default function AddProduct() {
                   <p className="font-mono text-xs text-neutral-500 mt-0.5">{p.id} · {p.category}{p.brand ? ` · ${p.brand}` : ""}</p>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-lg text-white">${p.price.toFixed(2)}</span>
+                  <span className="font-mono text-lg text-white">Rs {p.price}</span>
                   <Pill color={st.color} bg={st.bg} border={st.border}>{st.label === "In stock" ? `${p.stock} in stock` : st.label}</Pill>
                 </div>
                 <p className="font-mono text-xs text-neutral-500">{p.sold} sold all-time{p.discount ? ` · ${p.discount}% off` : ""}</p>

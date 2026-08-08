@@ -10,7 +10,6 @@ import { FieldLabel, TextField } from "../../components/FormFields";
 export default function Customers() {
   const { customers, setCustomers, orders } = useOutletContext();
   const [query, setQuery] = useState("");
-  const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
   const mergedCustomers = useMemo(() => {
@@ -88,7 +87,7 @@ export default function Customers() {
                       </div>
                     </td>
                     <td className="py-3 font-mono text-neutral-300">{c.orders}</td>
-                    <td className="py-3 font-mono text-white">${c.spent.toFixed(2)}</td>
+                    <td className="py-3 font-mono text-white">Rs {c.spent.toFixed(0)}</td>
                     <td className="py-3 font-mono text-neutral-500">{c.joined}</td>
                   </tr>
                 ))}
@@ -101,25 +100,7 @@ export default function Customers() {
         </div>
       </GlassCard>
 
-      {showModal && (
-        <Modal title="Add customer" onClose={() => setShowModal(false)}>
-          <div className="flex flex-col gap-4">
-            <div>
-              <FieldLabel>Name</FieldLabel>
-              <TextField value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ayesha Khan" />
-            </div>
-            <div>
-              <FieldLabel>Email</FieldLabel>
-              <TextField type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="ayesha.khan@mail.com" />
-            </div>
-            <div>
-              <FieldLabel>Phone</FieldLabel>
-              <TextField value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+92 300 1234567" />
-            </div>
-            <PrimaryButton onClick={addCustomer} className="justify-center mt-2">Add customer</PrimaryButton>
-          </div>
-        </Modal>
-      )}
+
     </>
   );
 }
