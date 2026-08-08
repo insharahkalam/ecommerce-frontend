@@ -124,29 +124,29 @@ export default function Navbar() {
                 </Link> */}
 
 
-                    <Link to="/" className="group flex shrink-0 items-center gap-3">
-                        {/* Logo badge with a clean inner plate so the logo stays visible */}
-                        <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 p-[2px] shadow-[0_6px_20px_-6px_rgba(249,115,22,0.85)] transition-all duration-300 group-hover:shadow-[0_10px_28px_-10px_rgba(249,115,22,0.95)] group-hover:-rotate-3 group-hover:scale-105">
-                            <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-white">
-                                <img
-                                    src={logo}
-                                    alt="UrbanTraders"
-                                    width={40}
-                                    height={40}
-                                    className="h-10 w-10 object-contain"
-                                />
-                            </span>
+                <Link to="/" className="group flex shrink-0 items-center gap-3">
+                    {/* Logo badge with a clean inner plate so the logo stays visible */}
+                    <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-orange-400 via-orange-500 to-amber-600 p-[2px] shadow-[0_6px_20px_-6px_rgba(249,115,22,0.85)] transition-all duration-300 group-hover:shadow-[0_10px_28px_-10px_rgba(249,115,22,0.95)] group-hover:-rotate-3 group-hover:scale-105">
+                        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[12px] bg-white">
+                            <img
+                                src={logo}
+                                alt="UrbanTraders"
+                                width={40}
+                                height={40}
+                                className="h-10 w-10 object-contain"
+                            />
                         </span>
+                    </span>
 
-                        <span className="flex flex-col leading-none">
-                            <span className="font-display text-[19px] font-extrabold tracking-[-0.03em] text-white">
-                                Urban<span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Traders</span>
-                            </span>
-                            <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[0.28em] text-neutral-500 sm:block">
-                                Shop Smart
-                            </span>
+                    <span className="flex flex-col leading-none">
+                        <span className="font-display text-[19px] font-extrabold tracking-[-0.03em] text-white">
+                            Urban<span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Traders</span>
                         </span>
-                    </Link>
+                        <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[0.28em] text-neutral-500 sm:block">
+                            Shop Smart
+                        </span>
+                    </span>
+                </Link>
 
 
 
