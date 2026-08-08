@@ -20,6 +20,13 @@ const FLOW = [
 
 const ACCENT = "#FB923C";
 
+// Formats a number as Pakistani Rupees, e.g. Rs. 12,500
+const formatPKR = (amount) =>
+    `Rs. ${Number(amount).toLocaleString("en-PK", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    })}`;
+
 /* ---------------- Progress tracker (vertical on mobile, horizontal on sm+) --------------- */
 function OrderProgress({ status }) {
     if (status === "Cancelled") {
@@ -251,7 +258,7 @@ export default function MyOrders() {
                 <StatTile
                     icon={Wallet}
                     label="Total spent"
-                    value={`$${totalSpent.toFixed(2)}`}
+                    value={formatPKR(totalSpent)}
                     hint="Across all completed and pending orders"
                 />
                 <StatTile
@@ -393,7 +400,7 @@ export default function MyOrders() {
                                         </div>
                                         <div className="text-right shrink-0">
                                             <p className="font-mono text-xl text-white leading-none">
-                                                ${o.totalAmount.toFixed(2)}
+                                                {formatPKR(o.totalAmount)}
                                             </p>
                                             <p className="font-serif text-[11px] text-neutral-500 mt-1.5">
                                                 order total
@@ -442,7 +449,7 @@ export default function MyOrders() {
                                                         × {item.quantity}
                                                     </span>
                                                     <span className="text-xs font-mono text-white shrink-0 w-16 text-right">
-                                                        ${(item.price * item.quantity).toFixed(2)}
+                                                        {formatPKR(item.price * item.quantity)}
                                                     </span>
                                                 </div>
                                             ))}
@@ -452,7 +459,7 @@ export default function MyOrders() {
                                                 Total charged
                                             </span>
                                             <span className="font-mono text-sm text-white">
-                                                ${o.totalAmount.toFixed(2)}
+                                                {formatPKR(o.totalAmount)}
                                             </span>
                                         </div>
                                     </div>
