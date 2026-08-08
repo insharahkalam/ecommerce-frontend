@@ -8,19 +8,31 @@ import { useCart } from "../../context/CartContext";
 import api from "../../config/axios";
 import { ORDERS_API_URL } from "../../data/mockData";
 
-// Ye account details ek jagah rakh dein taake future me change karna easy ho
+// Keep account details here in one place so they're easy to change later
 const BANK_ACCOUNT = {
-    bankName: "Meezan Bank",
-    accountTitle: "Insharah Kalam",
-    accountNumber: "1234567890123",
+    bankName: "Habib Bank Limited HBL",
+    accountTitle: "ASAD ULLAH",
+    accountNumber: "50207900875703",
+    iban: "PK03HABB0050207900875703",
 };
 
 const EASYPAISA_ACCOUNT = {
-    accountTitle: "Insharah Kalam",
-    accountNumber: "0300-1234567",
+    accountTitle: "Asadullah Munir",
+    accountNumber: "03706330317",
 };
 
 const MAX_RECEIPT_SIZE_MB = 5;
+
+// Real bank/Easypaisa transaction IDs are alphanumeric, no spaces or symbols,
+// and are typically between 6 and 20 characters long.
+const TRANSACTION_ID_PATTERN = /^[A-Za-z0-9]{6,20}$/;
+
+// Formats a number as Pakistani Rupees, e.g. Rs. 12,500
+const formatPKR = (amount) =>
+    `Rs. ${Number(amount).toLocaleString("en-PK", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    })}`;
 
 export default function Checkout() {
     const { cart, cartTotal, clearCart } = useCart();
@@ -30,23 +42,25 @@ export default function Checkout() {
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
     const [city, setCity] = useState("");
+    const [country, setCountry] = useState("Pakistan");
     const [paymentMethod, setPaymentMethod] = useState("COD");
     const [transactionId, setTransactionId] = useState("");
+    const [transactionIdError, setTransactionIdError] = useState("");
 
     // Receipt upload state
-    const [receiptPreview, setReceiptPreview] = useState(null); // base64 data url (bhejne ke liye)
+    const [receiptPreview, setReceiptPreview] = useState(null); // base64 data url (to send)
     const [receiptName, setReceiptName] = useState("");
     const [receiptError, setReceiptError] = useState("");
 
-    // "Maine payment kar di hai" confirmation checkbox — verification step
+    // "I have made the payment" confirmation checkbox — verification step
     const [paymentConfirmed, setPaymentConfirmed] = useState(false);
 
-    const [copied, setCopied] = useState(false);
+    const [copiedField, setCopiedField] = useState(""); // "account" | "iban"
     const [submitting, setSubmitting] = useState(false);
     const [toast, setToast] = useState(null);
 
-    const shipping = cartTotal > 100 ? 0 : 9.99;
-    const tax = +(cartTotal * 0.05).toFixed(2);
+    const shipping = 200;
+    const tax = +(cartTotal * 0.04).toFixed(2);
     const grandTotal = +(cartTotal + shipping + tax).toFixed(2);
 
 
@@ -58,10 +72,10 @@ export default function Checkout() {
         setTimeout(() => setToast(null), 3000);
     }
 
-    function handleCopyAccountNumber() {
-        navigator.clipboard.writeText(activeAccount.accountNumber).then(() => {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1500);
+    function handleCopy(value, field) {
+        navigator.clipboard.writeText(value).then(() => {
+            setCopiedField(field);
+            setTimeout(() => setCopiedField(""), 1500);
         });
     }
 
@@ -71,12 +85,12 @@ export default function Checkout() {
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
-            setReceiptError("Sirf image file (jpg, png, etc.) upload karein.");
+            setReceiptError("Please upload an image file only (jpg, png, etc.).");
             e.target.value = "";
             return;
         }
         if (file.size > MAX_RECEIPT_SIZE_MB * 1024 * 1024) {
-            setReceiptError(`Receipt ki size ${MAX_RECEIPT_SIZE_MB}MB se kam honi chahiye.`);
+            setReceiptError(`Receipt size must be less than ${MAX_RECEIPT_SIZE_MB}MB.`);
             e.target.value = "";
             return;
         }
@@ -86,7 +100,7 @@ export default function Checkout() {
             setReceiptPreview(reader.result);
             setReceiptName(file.name);
         };
-        reader.onerror = () => setReceiptError("Receipt read nahi ho saki, dobara try karein.");
+        reader.onerror = () => setReceiptError("Could not read the receipt, please try again.");
         reader.readAsDataURL(file);
     }
 
@@ -99,16 +113,26 @@ export default function Checkout() {
     async function handlePlaceOrder(e) {
         e.preventDefault();
 
-        if (!fullName.trim() || !phone.trim() || !address.trim() || !city.trim()) {
+        if (!fullName.trim() || !phone.trim() || !address.trim() || !city.trim() || !country.trim()) {
             showToast("Please fill in your complete shipping address.");
             return;
         }
 
         if (isDigitalTransfer) {
-            if (!transactionId.trim()) {
+            const trimmedTxnId = transactionId.trim();
+            if (!trimmedTxnId) {
+                setTransactionIdError("Please enter your transaction ID.");
                 showToast("Please enter your transaction ID.");
                 return;
             }
+            if (!TRANSACTION_ID_PATTERN.test(trimmedTxnId)) {
+                setTransactionIdError(
+                    "That doesn't look like a valid transaction ID (should be 6–20 letters/numbers, no spaces or symbols)."
+                );
+                showToast("Please enter a valid transaction ID.");
+                return;
+            }
+            setTransactionIdError("");
             if (!receiptPreview) {
                 showToast("Please upload your payment receipt screenshot.");
                 return;
@@ -131,11 +155,12 @@ export default function Checkout() {
                 })),
                 totalAmount: grandTotal,
                 paymentMethod,
-                shippingAddress: { fullName, phone, address, city },
+                shippingAddress: { fullName, phone, address, city, country },
                 ...(isDigitalTransfer && {
                     transferDetails: {
                         accountTitle: activeAccount.accountTitle,
                         accountNumber: activeAccount.accountNumber,
+                        ...(paymentMethod === "Bank Transfer" && { iban: BANK_ACCOUNT.iban }),
                         transactionId,
                         receiptImage: receiptPreview,
                     },
@@ -191,13 +216,17 @@ export default function Checkout() {
                                 <FieldLabel required>Phone</FieldLabel>
                                 <TextField value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+92 300 1234567" />
                             </div>
-                            <div className="sm:col-span-2">
-                                <FieldLabel required>Address</FieldLabel>
-                                <TextField value={address} onChange={(e) => setAddress(e.target.value)} placeholder="House 12, Street 5, DHA" />
-                            </div>
-                            <div className="sm:col-span-2">
+                            <div>
                                 <FieldLabel required>City</FieldLabel>
                                 <TextField value={city} onChange={(e) => setCity(e.target.value)} placeholder="Karachi" />
+                            </div>
+                            <div>
+                                <FieldLabel required>Country</FieldLabel>
+                                <TextField value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Pakistan" />
+                            </div>
+                            <div className="sm:col-span-2">
+                                <FieldLabel required>Address</FieldLabel>
+                                <TextField value={address} onChange={(e) => setAddress(e.target.value)} placeholder="House 24, Street 7, Block B, Gulshan-e-Iqbal" />
                             </div>
                         </div>
                     </div>
@@ -249,7 +278,7 @@ export default function Checkout() {
                                 <div className="rounded-xl border border-orange-500/25 bg-orange-500/[0.07] p-4 flex flex-col gap-3">
                                     <p className="text-xs font-serif text-orange-300">
                                         Please transfer{" "}
-                                        <span className="font-mono text-orange-200">${grandTotal.toFixed(2)}</span>{" "}
+                                        <span className="font-mono text-orange-200">{formatPKR(grandTotal)}</span>{" "}
                                         to the account below:
                                     </p>
 
@@ -264,15 +293,37 @@ export default function Checkout() {
                                             action={
                                                 <button
                                                     type="button"
-                                                    onClick={handleCopyAccountNumber}
+                                                    onClick={() => handleCopy(activeAccount.accountNumber, "account")}
                                                     className="flex items-center gap-1 text-[11px] font-serif text-orange-300 hover:text-orange-200 transition-colors"
                                                 >
-                                                    {copied ? <Check size={12} /> : <Copy size={12} />}
-                                                    {copied ? "Copied" : "Copy"}
+                                                    {copiedField === "account" ? <Check size={12} /> : <Copy size={12} />}
+                                                    {copiedField === "account" ? "Copied" : "Copy"}
                                                 </button>
                                             }
                                         />
+                                        {paymentMethod === "Bank Transfer" && (
+                                            <DetailRow
+                                                label="IBAN"
+                                                value={BANK_ACCOUNT.iban}
+                                                action={
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleCopy(BANK_ACCOUNT.iban, "iban")}
+                                                        className="flex items-center gap-1 text-[11px] font-serif text-orange-300 hover:text-orange-200 transition-colors"
+                                                    >
+                                                        {copiedField === "iban" ? <Check size={12} /> : <Copy size={12} />}
+                                                        {copiedField === "iban" ? "Copied" : "Copy"}
+                                                    </button>
+                                                }
+                                            />
+                                        )}
                                     </div>
+
+                                    {paymentMethod === "Bank Transfer" && (
+                                        <p className="text-[11px] font-serif text-neutral-500">
+                                            Use the <strong>Account Number</strong> if transferring from the same bank. Use the <strong>IBAN</strong> for online/IBFT transfers from a different bank.
+                                        </p>
+                                    )}
 
                                     <p className="text-[11px] font-serif text-neutral-500">
                                         After completing the payment, enter your transaction ID and upload a screenshot of the payment receipt below. Your order will be marked as <strong>"Paid"</strong> once the payment has been verified.
@@ -284,9 +335,18 @@ export default function Checkout() {
                                         <FieldLabel required>Transaction ID</FieldLabel>
                                         <TextField
                                             value={transactionId}
-                                            onChange={(e) => setTransactionId(e.target.value)}
-                                            placeholder="TXN123456789"
+                                            onChange={(e) => {
+                                                setTransactionId(e.target.value);
+                                                if (transactionIdError) setTransactionIdError("");
+                                            }}
+                                            placeholder="e.g. TXN123456789"
                                         />
+                                        <p className="text-[10px] font-serif text-neutral-500 mt-1">
+                                            6–20 letters/numbers, exactly as shown on your bank/Easypaisa receipt.
+                                        </p>
+                                        {transactionIdError && (
+                                            <p className="text-[11px] font-serif text-red-400 mt-1">{transactionIdError}</p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -329,20 +389,6 @@ export default function Checkout() {
                                     </div>
                                 </div>
 
-                                {receiptPreview && (
-                                    <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
-                                        <ImageIcon size={14} className="text-neutral-500 flex-shrink-0" />
-                                        <img
-                                            src={receiptPreview}
-                                            alt="Receipt Preview"
-                                            className="h-16 rounded-md ring-1 ring-white/10 object-cover"
-                                        />
-                                        <span className="text-[11px] font-serif text-neutral-500">
-                                            Receipt Preview
-                                        </span>
-                                    </div>
-                                )}
-
                                 {/* Verification / confirmation step */}
                                 <label className="flex items-start gap-2 cursor-pointer select-none">
                                     <input
@@ -381,21 +427,21 @@ export default function Checkout() {
                                         <p className="text-[10px] font-mono text-neutral-500">Qty {i.quantity}</p>
                                     </div>
                                     <span className="font-mono text-xs text-neutral-300">
-                                        ${(i.price * i.quantity).toFixed(2)}
+                                        {formatPKR(i.price * i.quantity)}
                                     </span>
                                 </div>
                             ))}
                         </div>
 
                         <div className="border-t border-white/10 pt-3 flex flex-col gap-2 text-sm font-serif">
-                            <Row label="Subtotal" value={`$${cartTotal.toFixed(2)}`} />
-                            <Row label="Shipping" value={shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`} />
-                            <Row label="Tax (5%)" value={`$${tax.toFixed(2)}`} />
+                            <Row label="Subtotal" value={formatPKR(cartTotal)} />
+                            <Row label="Shipping" value={shipping === 0 ? "Free" : formatPKR(shipping)} />
+                            <Row label="Tax (4%)" value={formatPKR(tax)} />
                         </div>
 
                         <div className="border-t border-white/10 pt-3 flex items-center justify-between">
                             <span className="font-serif text-neutral-300">Total</span>
-                            <span className="font-mono text-xl text-white">${grandTotal.toFixed(2)}</span>
+                            <span className="font-mono text-xl text-white">{formatPKR(grandTotal)}</span>
                         </div>
 
                         <PrimaryButton

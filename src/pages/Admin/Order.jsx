@@ -13,6 +13,13 @@ import api from "../../config/axios";
 const PAYMENT_STATUSES = ["Pending", "Paid", "Failed"];
 const MENU_WIDTH = 224; // w-56
 
+// Formats a number as Pakistani Rupees, e.g. Rs. 12,500
+const formatPKR = (amount) =>
+  `Rs. ${Number(amount).toLocaleString("en-PK", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })}`;
+
 export default function Order() {
   const { orders, setOrders } = useOutletContext();
   const [query, setQuery] = useState("");
@@ -86,24 +93,11 @@ export default function Order() {
     }
   }, [orders]);
 
-  // async function updateStatus(id, status) {
-  //   const prev = orders;
-  //   setOrders((p) => p.map((o) => (o.id === id ? { ...o, status } : o)));
-  //   setOpenMenuId(null);
-  //   try {
-  //     await api.put(`${ORDERS_API_URL}/update-status/${id}`, { status });
-  //     showToast(`Order marked ${status}.`);
-  //   } catch {
-  //     setOrders(prev);
-  //     showToast("Could not update order — server unreachable.", "error");
-  //   }
-  // }
-
   async function updateStatus(id, status) {
-    // Cancel karne se backend automatically stock wapas add kar deta hai — confirm le lo
+    // Cancelling an order automatically restores stock on the backend — confirm first
     if (status === "Cancelled") {
       const confirmed = window.confirm(
-        "Cancel karne se is order ke items ka stock automatically wapas add ho jayega. Continue karein?"
+        "Cancelling this order will automatically restore the stock for its items. Continue?"
       );
       if (!confirmed) {
         setOpenMenuId(null);
@@ -229,7 +223,7 @@ export default function Order() {
                 </div>
                 <div className="flex items-center justify-between border-t border-white/10 pt-3">
                   <span className="font-mono text-xs text-neutral-400">{o.items} items</span>
-                  <span className="font-mono text-base text-white">${o.total.toFixed(2)}</span>
+                  <span className="font-mono text-base text-white">{formatPKR(o.total)}</span>
                 </div>
               </div>
             </GlassCard>
@@ -279,7 +273,7 @@ export default function Order() {
                       <td className={`${td} max-w-[200px] truncate text-neutral-200`}>{o.customer}</td>
                       <td className={`${td} font-mono text-neutral-400`}>{o.items}</td>
                       <td className={`${td} whitespace-nowrap font-mono text-white`}>
-                        ${o.total.toFixed(2)}
+                        {formatPKR(o.total)}
                       </td>
                       <td className={td}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
@@ -398,12 +392,12 @@ export default function Order() {
                       <div className="min-w-0">
                         <p className="truncate text-sm text-white">{item.title}</p>
                         <p className="font-mono text-xs text-neutral-500">
-                          Qty {item.quantity} · ${item.price.toFixed(2)}
+                          Qty {item.quantity} · {formatPKR(item.price)}
                         </p>
                       </div>
                     </div>
                     <span className="shrink-0 font-mono text-sm text-white">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatPKR(item.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -524,7 +518,7 @@ export default function Order() {
             <div className="flex items-center justify-between rounded-xl border border-orange-500/25 bg-orange-500/10 px-4 py-3">
               <span className="text-sm font-serif tracking-wide text-orange-300">Total Amount</span>
               <span className="font-serif text-xl font-semibold text-white">
-                ${viewingOrder.total.toFixed(2)}
+                {formatPKR(viewingOrder.total)}
               </span>
             </div>
           </div>

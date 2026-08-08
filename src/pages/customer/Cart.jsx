@@ -1,32 +1,25 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-    Minus,
-    Plus,
-    Trash2,
-    ShoppingBag,
-    ArrowRight,
-    Truck,
-    ShieldCheck,
-    RotateCcw,
-    Tag,
-} from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, ShieldCheck, RotateCcw, Tag, } from "lucide-react";
 import GlassCard from "../../components/GlassCard";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useCart } from "../../context/CartContext";
 
-const FREE_SHIP_THRESHOLD = 100;
+// Formats a number as Pakistani Rupees, e.g. Rs. 12,500
+const formatPKR = (amount) =>
+    `Rs. ${Number(amount).toLocaleString("en-PK", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    })}`;
 
 export default function Cart() {
     const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
     const navigate = useNavigate();
 
-    const shipping = cartTotal > FREE_SHIP_THRESHOLD ? 0 : cart.length ? 9.99 : 0;
-    const tax = +(cartTotal * 0.05).toFixed(2);
+    const shipping = 200;
+    const tax = +(cartTotal * 0.04).toFixed(2);
     const grandTotal = +(cartTotal + shipping + tax).toFixed(2);
     const itemCount = cart.reduce((n, i) => n + i.quantity, 0);
-    const remaining = Math.max(0, FREE_SHIP_THRESHOLD - cartTotal);
-    const progress = Math.min(100, (cartTotal / FREE_SHIP_THRESHOLD) * 100);
 
     /* ---------------- Empty state ---------------- */
     if (cart.length === 0) {
@@ -110,7 +103,7 @@ export default function Cart() {
                                         {item.title}
                                     </Link>
                                     <p className="mt-1 font-mono text-xs text-neutral-500">
-                                        ${item.price.toFixed(2)} each
+                                        {formatPKR(item.price)} each
                                     </p>
 
                                     <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -148,11 +141,11 @@ export default function Cart() {
 
                                 <div className="text-right sm:w-24">
                                     <p className="font-mono text-base text-white">
-                                        ${(item.price * item.quantity).toFixed(2)}
+                                        {formatPKR(item.price * item.quantity)}
                                     </p>
                                     {item.quantity > 1 && (
                                         <p className="mt-0.5 font-mono text-[10px] text-neutral-500">
-                                            {item.quantity} × ${item.price.toFixed(2)}
+                                            {item.quantity} × {formatPKR(item.price)}
                                         </p>
                                     )}
                                 </div>
@@ -178,13 +171,13 @@ export default function Cart() {
                             </p>
 
                             <div className="flex flex-col gap-2.5">
-                                <Row label="Subtotal" value={`$${cartTotal.toFixed(2)}`} />
+                                <Row label="Subtotal" value={formatPKR(cartTotal)} />
                                 <Row
                                     label="Shipping"
-                                    value={shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                                    value={shipping === 0 ? "Free" : formatPKR(shipping)}
                                     highlight={shipping === 0}
                                 />
-                                <Row label="Estimated tax (5%)" value={`$${tax.toFixed(2)}`} />
+                                <Row label="Estimated tax (4%)" value={formatPKR(tax)} />
                             </div>
 
                             <div className="flex items-center justify-between border-t border-white/10 pt-4">
@@ -193,7 +186,7 @@ export default function Cart() {
                                     <p className="font-serif text-[10px] text-neutral-500">Incl. taxes</p>
                                 </div>
                                 <span className="font-mono text-2xl tracking-tight text-white">
-                                    ${grandTotal.toFixed(2)}
+                                    {formatPKR(grandTotal)}
                                 </span>
                             </div>
 
