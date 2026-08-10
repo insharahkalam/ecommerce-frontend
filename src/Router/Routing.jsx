@@ -78,6 +78,7 @@ import Setting from '../pages/Admin/Setting';
 import Shop from '../pages/customer/Shop';
 import About from '../pages/customer/About';
 import Contact from '../pages/customer/Contact';
+import NotificationsPage from '../pages/Admin/Notifications';
 
 const Routing = () => {
     return (
@@ -93,7 +94,6 @@ const Routing = () => {
                             <Route path='/cart' element={<Cart />} />
                             <Route path='/checkout' element={<Checkout />} />
                             <Route path='/my-orders' element={<MyOrders />} />
-                            
                             <Route path="/shop" element={<Shop />} />
                             <Route path="/about" element={<About />} />
                             <Route path="/contact" element={<Contact />} />
@@ -117,6 +117,7 @@ const Routing = () => {
                             <Route path='/customers' element={<Customers />} />
                             <Route path='/add-product' element={<AddProduct />} />
                             <Route path='/setting' element={<Setting />} />
+                            <Route path='/notifications' element={<NotificationsPage />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>

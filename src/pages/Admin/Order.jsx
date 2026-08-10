@@ -417,7 +417,7 @@ export default function Order() {
                     Contact: <span className="text-neutral-200">{viewingOrder.shippingAddress.phone}</span>
                   </p>
                   <p className="font-mono text-xs text-neutral-500 leading-relaxed">
-                    Address: <span className="text-neutral-300 font-serif">{viewingOrder.shippingAddress.address}, {viewingOrder.shippingAddress.city}</span>
+                    Address: <span className="text-neutral-300 font-serif">{viewingOrder.shippingAddress.address}, {viewingOrder.shippingAddress.city}, {viewingOrder.shippingAddress.country}</span>
                   </p>
                 </div>
               </div>

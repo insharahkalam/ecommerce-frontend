@@ -75,8 +75,8 @@ function ToggleRow({ label, desc, value, onChange }) {
 }
 
 export default function Setting() {
-  const [fullName, setFullName] = useState("Ali Raza");
-  const [email, setEmail] = useState("admin@ledgerstore.com");
+  const [fullName, setFullName] = useState("Asad");
+  const [email, setEmail] = useState("asad@gmail.com");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -99,10 +99,7 @@ export default function Setting() {
   }
 
   return (
-    <div className="relative min-h-screen bg-neutral-950 text-white font-sans antialiased">
-      {/* Ambient glow — fixed to viewport so it's always visible regardless of page length/scroll */}
-      <div className="pointer-events-none fixed -top-40 -left-32 h-[32rem] w-[32rem] rounded-full bg-orange-500/25 blur-[100px] z-0" />
-      <div className="pointer-events-none fixed -bottom-40 -right-32 h-[32rem] w-[32rem] rounded-full bg-orange-600/15 blur-[100px] z-0" />
+    <div className="relative min-h-screen text-white font-sans antialiased">
       <div
         className="pointer-events-none fixed inset-0 z-0 opacity-[0.15]"
         style={{
@@ -112,7 +109,7 @@ export default function Setting() {
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 py-10">
+      <div className="relative z-10 mx-auto max-w-6xl">
         <div className="mb-8">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-500">
             <BadgeCheck className="h-3.5 w-3.5" /> Admin console
@@ -125,91 +122,86 @@ export default function Setting() {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            <GlowCard>
-              <SectionHeader icon={User} title="Profile" desc="Your admin identity across the dashboard." />
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <FieldLabel icon={User}>Full name</FieldLabel>
-                  <TextField value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                </div>
-                <div>
-                  <FieldLabel icon={Mail}>Email</FieldLabel>
-                  <TextField value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
+        <div className="space-y-6">
+          <GlowCard>
+            <SectionHeader icon={User} title="Profile" desc="Your admin identity across the dashboard." />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <FieldLabel icon={User}>Full name</FieldLabel>
+                <TextField value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
-            </GlowCard>
-
-            <GlowCard>
-              <SectionHeader icon={Lock} title="Security" desc="Update your password regularly." />
-              <div className="space-y-5">
-                <div className="sm:max-w-sm">
-                  <FieldLabel icon={Lock}>Current password</FieldLabel>
-                  <TextField
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="••••••••"
-                  />
-                </div>
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <FieldLabel>New password</FieldLabel>
-                    <TextField
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="At least 8 characters"
-                    />
-                  </div>
-                  <div>
-                    <FieldLabel>Confirm password</FieldLabel>
-                    <TextField
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repeat new password"
-                    />
-                  </div>
-                </div>
-                {passwordError && (
-                  <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
-                    {passwordError}
-                  </p>
-                )}
+              <div>
+                <FieldLabel icon={Mail}>Email</FieldLabel>
+                <TextField value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
-            </GlowCard>
+            </div>
 
-            <GlowCard>
-              <SectionHeader icon={Bell} title="Notifications" desc="Choose what we alert you about." />
-              <div className="space-y-3">
-                <ToggleRow label="New orders" desc="Get notified on every new order." value={notifyOrders} onChange={setNotifyOrders} />
-                <ToggleRow label="Low stock" desc="Alert when a product runs low." value={notifyStock} onChange={setNotifyStock} />
-                <ToggleRow label="New signups" desc="Notify me when a customer registers." value={notifySignups} onChange={setNotifySignups} />
-              </div>
-            </GlowCard>
-          </div>
-
-          <div className="space-y-6">
-            <GlowCard>
-              <SectionHeader icon={Shield} title="Role" desc="Your access level is fixed." />
+            <div className="mt-6 border-t border-neutral-800 pt-6">
+              <FieldLabel icon={Shield}>Role</FieldLabel>
               <div className="flex items-center justify-between rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3">
                 <span className="text-sm font-semibold text-orange-500">Admin</span>
                 <BadgeCheck className="h-4 w-4 text-orange-500" />
               </div>
-              <p className="mt-3 text-xs text-neutral-400">
-                Full access to products, orders, and customers.
+              <p className="mt-2 text-xs text-neutral-400">
+                Full access to products, orders, and customers. Your access level is fixed.
               </p>
-            </GlowCard>
+            </div>
+          </GlowCard>
 
-            <GlowCard className="lg:sticky lg:top-6">
-              <p className="font-serif text-sm font-medium text-white">Save your changes</p>
-              <p className="mt-1 text-xs text-neutral-400">Changes apply immediately after saving.</p>
+          <GlowCard>
+            <SectionHeader icon={Lock} title="Security" desc="Update your password regularly." />
+            <div className="space-y-5">
+              <div className="sm:max-w-sm">
+                <FieldLabel icon={Lock}>Current password</FieldLabel>
+                <TextField
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <FieldLabel>New password</FieldLabel>
+                  <TextField
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Confirm password</FieldLabel>
+                  <TextField
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                  />
+                </div>
+              </div>
+              {passwordError && (
+                <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                  {passwordError}
+                </p>
+              )}
+            </div>
+          </GlowCard>
+
+          <GlowCard>
+            <SectionHeader icon={Bell} title="Notifications" desc="Choose what we alert you about." />
+            <div className="space-y-3">
+              <ToggleRow label="New orders" desc="Get notified on every new order." value={notifyOrders} onChange={setNotifyOrders} />
+              <ToggleRow label="Low stock" desc="Alert when a product runs low." value={notifyStock} onChange={setNotifyStock} />
+              <ToggleRow label="New signups" desc="Notify me when a customer registers." value={notifySignups} onChange={setNotifySignups} />
+            </div>
+
+            <div className="mt-6 border-t border-neutral-800 pt-6">
+              <p className="text-xs text-neutral-400">Changes apply immediately after saving.</p>
               <button
                 type="button"
                 onClick={save}
-                className="font-display mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2.5 text-sm font-semibold text-white tracking-tight shadow-lg shadow-orange-500/20 transition-all hover:from-orange-400 hover:to-orange-500 active:scale-[0.99]"
+                className="font-display mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2.5 text-sm font-semibold text-white tracking-tight shadow-lg shadow-orange-500/20 transition-all hover:from-orange-400 hover:to-orange-500 active:scale-[0.99]"
               >
                 {saved ? (
                   <>
@@ -222,8 +214,8 @@ export default function Setting() {
               {saved && (
                 <p className="mt-3 text-xs text-orange-500">Your changes have been saved.</p>
               )}
-            </GlowCard>
-          </div>
+            </div>
+          </GlowCard>
         </div>
       </div>
     </div>
