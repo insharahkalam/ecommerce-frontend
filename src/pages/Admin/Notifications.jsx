@@ -89,7 +89,7 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div className="relative min-h-screen bg-neutral-950 text-white font-sans antialiased">
+        <div className="relative min-h-screen text-white font-sans antialiased">
             <div
                 className="pointer-events-none fixed inset-0 z-0 opacity-[0.15]"
                 style={{
@@ -99,7 +99,7 @@ export default function NotificationsPage() {
                 }}
             />
 
-            <div className="relative z-10 mx-auto max-w-3xl px-6 py-10">
+            <div className="relative z-10 mx-auto ">
                 <div className="mb-8 flex items-start justify-between gap-4">
                     <div>
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-500">

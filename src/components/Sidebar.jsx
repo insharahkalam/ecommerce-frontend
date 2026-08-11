@@ -12,6 +12,7 @@ const navItems = [
   { path: "/add-product", label: "Products", icon: Package },
   { path: "/customers", label: "Customers", icon: Users },
   { path: "/setting", label: "Settings", icon: Settings },
+  // { path: "/notifications", label: "Notifications", icon: Notification },
 ];
 
 export default function Sidebar({ mobileNavOpen, setMobileNavOpen }) {
