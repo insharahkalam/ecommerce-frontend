@@ -58,6 +58,36 @@ export default function NotificationsPage() {
         };
         fetchAll();
 
+        api.patch(`${NOTIFICATION_API_URL}/read-all`, {}, { withCredentials: true })
+            .then(() => {
+                window.dispatchEvent(new CustomEvent("notifications-read", { detail: { count: 0 } }));
+            })
+            .catch(() => { });
+
+        const channel = pusherClient.subscribe("admin-notifications");
+        channel.bind("new-notification", (newNotif) => {
+            setNotifications((prev) => [newNotif, ...prev]);
+        });
+
+        return () => {
+            channel.unbind_all();
+            pusherClient.unsubscribe("admin-notifications");
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchAll = async () => {
+            try {
+                const res = await api.get(NOTIFICATION_API_URL, { withCredentials: true });
+                setNotifications(res.data.notifications);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAll();
+
         api.patch(`${NOTIFICATION_API_URL}/read-all`, {}, { withCredentials: true }).catch(() => { });
 
         const channel = pusherClient.subscribe("admin-notifications");
@@ -129,8 +159,8 @@ export default function NotificationsPage() {
                     ) : (
                         <ul className="divide-y divide-neutral-800">
                             {notifications.map((n) => {
-                                console.log(n,"notifi show");
-                                
+                                console.log(n, "notifi show");
+
                                 const meta = TYPE_META[n.type] || TYPE_META.order;
                                 const Icon = meta.icon;
                                 return (

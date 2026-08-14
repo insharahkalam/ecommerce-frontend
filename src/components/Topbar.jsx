@@ -1,8 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, Bell, ChevronDown, LogOut } from "lucide-react";
+import { Menu, Bell, ChevronDown, LogOut, Package, AlertTriangle, UserPlus } from "lucide-react";
+import toast from "react-hot-toast";
 import { pageTitles, AUTH_BASE_URL, NOTIFICATION_API_URL } from "../data/mockData";
 import api from "../config/axios";
+import pusherClient from "../config/pusher";
+
+const TYPE_ICON = {
+  order: Package,
+  low_stock: AlertTriangle,
+  new_customer: UserPlus,
+};
 
 export default function Topbar({ setMobileNavOpen, admin }) {
   const location = useLocation();
@@ -11,6 +19,15 @@ export default function Topbar({ setMobileNavOpen, admin }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
+
+
+  useEffect(() => {
+    function handleNotificationsRead(e) {
+      setUnreadCount(e.detail?.count ?? 0);
+    }
+    window.addEventListener("notifications-read", handleNotificationsRead);
+    return () => window.removeEventListener("notifications-read", handleNotificationsRead);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -35,13 +52,48 @@ export default function Topbar({ setMobileNavOpen, admin }) {
     }
 
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000); // poll every 30s
+    const interval = setInterval(fetchUnreadCount, 30000); // poll every 30s (fallback)
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
   }, []);
+
+  // Real-time — naya notification aate hi count badhao + toast dikhao
+  useEffect(() => {
+    const channel = pusherClient.subscribe("admin-notifications");
+
+    channel.bind("new-notification", (newNotif) => {
+      setUnreadCount((prev) => prev + 1);
+
+      const Icon = TYPE_ICON[newNotif.type] || Package;
+      toast.custom(
+        (t) => (
+          <div
+            className={`flex items-start gap-3 rounded-xl border border-orange-500/30 bg-neutral-950 px-4 py-3 shadow-lg transition cursor-pointer ${t.visible ? "opacity-100" : "opacity-0"
+              }`}
+            onClick={() => {
+              toast.dismiss(t.id);
+              navigate("/notifications");
+            }}
+          >
+            <Icon className="mt-0.5 h-5 w-5 shrink-0 text-orange-400" />
+            <div>
+              <p className="text-sm font-medium text-white">{newNotif.title}</p>
+              <p className="text-xs text-neutral-400">{newNotif.message}</p>
+            </div>
+          </div>
+        ),
+        { duration: 4000 }
+      );
+    });
+
+    return () => {
+      channel.unbind_all();
+      pusherClient.unsubscribe("admin-notifications");
+    };
+  }, [navigate]);
 
   const displayName = admin?.username || "Admin";
   const initials = displayName
