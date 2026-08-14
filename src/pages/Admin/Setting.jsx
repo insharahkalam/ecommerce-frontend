@@ -311,7 +311,7 @@ export default function Setting() {
   const [passwordError, setPasswordError] = useState("");
   const [notifyOrders, setNotifyOrders] = useState(true);
   const [notifyStock, setNotifyStock] = useState(true);
-  const [notifySignups, setNotifySignups] = useState(false);
+  const [notifySignups, setNotifySignups] = useState(true);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
