@@ -93,7 +93,7 @@ export default function Sidebar({ mobileNavOpen, setMobileNavOpen }) {
   useEffect(() => {
     const fetchUnread = async () => {
       try {
-        const res = await api.get("/api/notifications", { withCredentials: true });
+        const res = await api.get(`${NOTIFICATION_API_URL}`, { withCredentials: true });
         console.log(res, "res notifications");
 
         setUnreadCount(res.data.unreadCount);

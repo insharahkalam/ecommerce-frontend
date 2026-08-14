@@ -4,6 +4,8 @@ export const AUTH_BASE_URL = "/authentication";
 
 export const ORDERS_API_URL = "/orders";
 
+export const NOTIFICATION_API_URL = "/notifications";
+
 export const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
 export const revenueData = [

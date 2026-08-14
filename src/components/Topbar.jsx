@@ -91,7 +91,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Menu, Bell, ChevronDown, LogOut } from "lucide-react";
-import { pageTitles, AUTH_BASE_URL } from "../data/mockData";
+import { pageTitles, AUTH_BASE_URL, NOTIFICATION_API_URL } from "../data/mockData";
 import api from "../config/axios";
 
 export default function Topbar({ setMobileNavOpen, admin }) {
@@ -119,7 +119,7 @@ export default function Topbar({ setMobileNavOpen, admin }) {
       try {
         // Assumes a backend endpoint that returns { unreadCount: number }.
         // Adjust the path to match your actual notifications route.
-        const res = await api.get("/notifications/unread-count");
+        const res = await api.get(`${NOTIFICATION_API_URL}/unread-count`);
         if (!cancelled) setUnreadCount(res.data?.unreadCount ?? 0);
       } catch (err) {
         // silently ignore — badge just won't update this cycle

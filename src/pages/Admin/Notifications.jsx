@@ -217,8 +217,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingCart, AlertTriangle, UserPlus, Bell } from "lucide-react";
-import axios from "axios";
-import pusher from "../../config/pusher"
+import pusherClient from "../../config/pusher";
+import api from "../../config/axios";
+import { NOTIFICATION_API_URL } from "../../data/mockData";
 
 const typeIcon = {
     order: ShoppingCart,
@@ -234,7 +235,7 @@ export default function Notifications() {
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const res = await axios.get("/api/notifications", { withCredentials: true });
+                const res = await api.get(`${NOTIFICATION_API_URL}`, { withCredentials: true });
                 setNotifications(res.data.notifications);
             } catch (err) {
                 console.error(err);
@@ -245,7 +246,7 @@ export default function Notifications() {
         fetchAll();
 
         // sab ko read mark karo jab page khule (Sidebar mein bhi kiya hai badge ke liye)
-        axios.patch("/api/notifications/read-all", {}, { withCredentials: true }).catch(() => { });
+        api.patch(`${NOTIFICATION_API_URL}/read-all`, {}, { withCredentials: true }).catch(() => { });
 
         const channel = pusherClient.subscribe("admin-notifications");
         channel.bind("new-notification", (newNotif) => {
@@ -261,7 +262,7 @@ export default function Notifications() {
     const handleClick = async (notif) => {
         if (!notif.isRead) {
             try {
-                await axios.patch(`/api/notifications/${notif._id}/read`, {}, { withCredentials: true });
+                await api.patch(`${NOTIFICATION_API_URL}/${notif._id}/read`, {}, { withCredentials: true });
             } catch (err) {
                 console.error(err);
             }
@@ -293,8 +294,8 @@ export default function Notifications() {
                             key={notif._id}
                             onClick={() => handleClick(notif)}
                             className={`flex items-start gap-3 text-left px-4 py-3 rounded-lg border transition-colors ${notif.isRead
-                                    ? "border-white/5 bg-white/[0.02]"
-                                    : "border-orange-500/20 bg-orange-500/[0.06]"
+                                ? "border-white/5 bg-white/[0.02]"
+                                : "border-orange-500/20 bg-orange-500/[0.06]"
                                 }`}
                         >
                             <Icon size={18} className="mt-0.5 text-orange-400 shrink-0" />
