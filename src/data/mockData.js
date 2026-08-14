@@ -6,6 +6,9 @@ export const ORDERS_API_URL = "/orders";
 
 export const NOTIFICATION_API_URL = "/notifications";
 
+export const SETTINGS_API_URL = "/notificationSettings";
+
+
 export const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 
 export const revenueData = [
