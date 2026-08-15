@@ -133,6 +133,7 @@ export default function AdminLayout() {
       );
     });
 
+    // Naya order place hote hi real-time list mein aa jaye — bina refresh ke.
     channel.bind("new-order", (data) => {
       setOrders((prev) => {
         if (prev.some((o) => o.id === data._id)) return prev;
@@ -143,6 +144,23 @@ export default function AdminLayout() {
     return () => {
       channel.unbind_all();
       pusherClient.unsubscribe("admin-orders");
+    };
+  }, []);
+
+  // Real-time — naya signup hote hi Customers table turant update ho jaye
+  useEffect(() => {
+    const channel = pusherClient.subscribe("admin-customers");
+
+    channel.bind("new-customer", (data) => {
+      setCustomers((prev) => {
+        if (prev.some((c) => c.id === data._id)) return prev;
+        return [normalizeCustomer(data), ...prev];
+      });
+    });
+
+    return () => {
+      channel.unbind_all();
+      pusherClient.unsubscribe("admin-customers");
     };
   }, []);
 
