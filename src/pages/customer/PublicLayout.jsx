@@ -5,7 +5,7 @@ import Footer from "../../components/Footer";
 
 export default function PublicLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-950 text-white">
+    <div className="min-h-screen flex flex-col bg-bg text-text">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
         .font-display { font-family: 'Fraunces', serif; }

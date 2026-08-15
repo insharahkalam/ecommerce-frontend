@@ -102,11 +102,11 @@ export default function Shop() {
                         onClick={() => { setCat(c.name); onPick?.(); }}
                         className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left font-serif text-sm capitalize transition-colors ${cat === c.name
                             ? "bg-orange-500/15 text-orange-400"
-                            : "text-neutral-400 hover:bg-white/5 hover:text-neutral-100"
+                            : "text-text-muted hover:bg-hover hover:text-text"
                             }`}
                     >
                         <span>{c.name === "all" ? "All products" : c.name}</span>
-                        <span className="text-xs text-neutral-500">{c.count}</span>
+                        <span className="text-xs text-text-muted">{c.count}</span>
                     </button>
                 </li>
             ))}
@@ -114,16 +114,16 @@ export default function Shop() {
     );
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-neutral-100">
+        <div className="min-h-screen bg-bg text-text">
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
                 {/* Hero */}
-                <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-transparent p-6 sm:p-10">
+                <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-hover to-transparent p-6 sm:p-10">
                     <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-orange-500/20 blur-3xl" />
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 font-serif text-xs text-orange-400">
                         <Sparkles size={12} /> New season drop
                     </span>
                     <h1 className="mt-4 font-display text-3xl font-semibold italic sm:text-5xl">Shop the collection</h1>
-                    <p className="mt-2 max-w-lg font-serif text-sm text-neutral-400">
+                    <p className="mt-2 max-w-lg font-serif text-sm text-text-muted">
                         {products.length} curated pieces — {list.length} showing right now.
                     </p>
                     <div className="mt-6 max-w-md">
@@ -138,9 +138,9 @@ export default function Shop() {
                         { icon: RotateCcw, label: "7-day returns" },
                         { icon: ShieldCheck, label: "Secure payment" },
                     ].map(({ icon: Icon, label }) => (
-                        <div key={label} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">
+                        <div key={label} className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-3">
                             <Icon size={16} className="shrink-0 text-orange-400" />
-                            <span className="font-serif text-[11px] text-neutral-400 sm:text-xs">{label}</span>
+                            <span className="font-serif text-[11px] text-text-muted sm:text-xs">{label}</span>
                         </div>
                     ))}
                 </div>
@@ -149,7 +149,7 @@ export default function Shop() {
                     {/* Desktop sidebar */}
                     <aside className="hidden w-56 shrink-0 lg:block">
                         <div className="sticky top-24">
-                            <h3 className="mb-3 font-serif text-xs uppercase tracking-widest text-neutral-500">Categories</h3>
+                            <h3 className="mb-3 font-serif text-xs uppercase tracking-widest text-text-muted">Categories</h3>
                             <CategoryList />
                         </div>
                     </aside>
@@ -160,16 +160,16 @@ export default function Shop() {
                         <div className="-mx-4 mb-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 lg:hidden">
                             <button
                                 onClick={() => setDrawerOpen(true)}
-                                className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-serif text-xs hover:bg-white/10 transition-colors"
+                                className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-hover px-3 py-1.5 font-serif text-xs hover:bg-hover transition-colors"
                             >
                                 <LayoutGrid size={13} /> Categories
                             </button>
 
-                            <div className="h-4 w-px shrink-0 bg-white/10" />
+                            <div className="h-4 w-px shrink-0 bg-border" />
 
                             <button
                                 onClick={() => setCat("all")}
-                                className={`shrink-0 rounded-full px-3 py-1.5 font-serif text-xs capitalize transition-colors ${cat === "all" ? "bg-orange-500 text-white" : "border border-white/10 text-neutral-400"
+                                className={`shrink-0 rounded-full px-3 py-1.5 font-serif text-xs capitalize transition-colors ${cat === "all" ? "bg-orange-500 text-white" : "border border-border text-text-muted"
                                     }`}
                             >
                                 All
@@ -194,11 +194,11 @@ export default function Shop() {
 
                         {/* Sort bar */}
                         <div className="mb-5 flex items-center justify-between gap-3">
-                            <p className="font-serif text-xs text-neutral-500">{list.length} products</p>
+                            <p className="font-serif text-xs text-text-muted">{list.length} products</p>
                             <select
                                 value={sort}
                                 onChange={(e) => setSort(e.target.value)}
-                                className="rounded-lg border border-white/10 bg-neutral-900 px-3 py-2 font-serif text-xs text-neutral-300 outline-none"
+                                className="rounded-lg border border-border bg-surface px-3 py-2 font-serif text-xs text-text outline-none"
                             >
                                 <option value="featured">Featured</option>
                                 <option value="low">Price: Low to High</option>
@@ -211,12 +211,12 @@ export default function Shop() {
                         {loading ? (
                             <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
                                 {Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="h-72 animate-pulse rounded-2xl border border-white/10 bg-white/[0.04]" />
+                                    <div key={i} className="h-72 animate-pulse rounded-2xl border border-border bg-hover" />
                                 ))}
                             </div>
                         ) : list.length === 0 ? (
-                            <div className="rounded-2xl border border-dashed border-white/10 py-20 text-center">
-                                <p className="font-serif text-sm text-neutral-400">No products found.</p>
+                            <div className="rounded-2xl border border-dashed border-border py-20 text-center">
+                                <p className="font-serif text-sm text-text-muted">No products found.</p>
                                 <button
                                     onClick={() => { setCat("all"); setQ(""); }}
                                     className="mt-4 rounded-lg bg-orange-500 px-4 py-2 font-serif text-xs text-white hover:bg-orange-600"
@@ -235,8 +235,8 @@ export default function Shop() {
                         {/* Promo */}
                         {!loading && list.length > 0 && (
                             <div className="mt-10 overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-r from-orange-500/15 to-transparent p-6 sm:p-8">
-                                <h4 className="font-serif text-xl font-semibold">Get 10% off your first order</h4>
-                                <p className="mt-1 font-serif text-sm text-neutral-400">
+                                <h4 className="font-serif text-xl font-semibold text-text">Get 10% off your first order</h4>
+                                <p className="mt-1 font-serif text-sm text-text-muted">
                                     Use code <span className="text-orange-400">WELCOME10</span> at checkout.
                                 </p>
                             </div>
@@ -249,10 +249,10 @@ export default function Shop() {
             {drawerOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
-                    <aside className="absolute left-0 top-0 h-full w-72 border-r border-white/10 bg-neutral-950 p-5">
+                    <aside className="absolute left-0 top-0 h-full w-72 border-r border-border bg-bg p-5">
                         <div className="mb-4 flex items-center justify-between">
-                            <h3 className="font-serif text-sm uppercase tracking-widest text-neutral-500">Categories</h3>
-                            <button onClick={() => setDrawerOpen(false)}><X size={18} /></button>
+                            <h3 className="font-serif text-sm uppercase tracking-widest text-text-muted">Categories</h3>
+                            <button onClick={() => setDrawerOpen(false)} className="text-text"><X size={18} /></button>
                         </div>
                         <CategoryList onPick={() => setDrawerOpen(false)} />
                         <button
