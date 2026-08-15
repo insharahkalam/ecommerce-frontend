@@ -433,7 +433,7 @@ export default function Navbar() {
         <header
             className={`sticky top-0 z-50 font-sans transition-all duration-300 ${scrolled
                 ? "border-b border-black/10 dark:border-white/10 bg-white/85 dark:bg-neutral-950/85 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.9)] backdrop-blur-2xl"
-                : "border-b border-black/[0.06] dark:border-white/[0.06] bg-white/60 dark:bg-neutral-950/60 backdrop-blur-xl"
+                : "border-b border-black/[0.06] dark:border-white/[0.06] bg-white dark:bg-neutral-950/60 backdrop-blur-xl"
                 }`}
         >
             {/* top accent hairline */}
