@@ -7,8 +7,13 @@ import StatCard from "../../components/StatCard";
 import Pill from "../../components/Pill";
 import PrimaryButton from "../../components/PrimaryButton";
 import { statusStyle } from "../../utils/badgeStyles";
-import { revenueData } from "../../data/mockData";
 import { calculateDelta } from "../../utils/calculateDelta";
+
+function getDateFromObjectId(id) {
+  if (!id || id.length < 8) return null;
+  const timestamp = parseInt(id.substring(0, 8), 16) * 1000;
+  return new Date(timestamp);
+}
 
 export default function AdminDashboard() {
   const { orders, products, customers } = useOutletContext();
@@ -16,6 +21,39 @@ export default function AdminDashboard() {
   const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
   const topProducts = [...products].sort((a, b) => b.sold - a.sold).slice(0, 5);
   const recentOrders = orders.slice(0, 6);
+
+  const todayLabel = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  // Real revenue chart — last 7 days, grouped from actual orders
+  const revenueData = useMemo(() => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - i);
+      days.push(d);
+    }
+
+    return days.map((day) => {
+      const nextDay = new Date(day);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      const dayOrders = orders.filter((o) => {
+        const created = getDateFromObjectId(o.id);
+        return created && created >= day && created < nextDay;
+      });
+
+      return {
+        day: day.toLocaleDateString("en-US", { weekday: "short" }),
+        revenue: dayOrders.reduce((s, o) => s + (o.total || 0), 0),
+        orders: dayOrders.length,
+      };
+    });
+  }, [orders]);
 
   // Real deltas — last 30 din vs pichle 30 din, id (Mongo _id) se date nikal ke calculate
   const revenueDelta = useMemo(
@@ -31,7 +69,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-display italic text-2xl font-semibold tracking-tight text-white">Overview</h1>
-          <p className="text-sm mt-1 text-neutral-400 font-serif">Friday, 17 July — here's how the store is doing this week.</p>
+          <p className="text-sm mt-1 text-neutral-400 font-serif">{todayLabel} — here's how the store is doing this week.</p>
         </div>
         <PrimaryButton onClick={() => navigate("/add-product")}>
           <Plus size={16} /> Add product
@@ -100,6 +138,9 @@ export default function AdminDashboard() {
                 <span className="font-serif text-xs text-white"> {p.sold} sold</span>
               </div>
             ))}
+            {topProducts.length === 0 && (
+              <p className="text-xs text-neutral-500 font-serif">No products yet.</p>
+            )}
           </div>
         </GlassCard>
       </div>
@@ -137,6 +178,13 @@ export default function AdminDashboard() {
                     </tr>
                   );
                 })}
+                {recentOrders.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-neutral-500 font-serif text-sm">
+                      No orders yet.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -145,4 +193,3 @@ export default function AdminDashboard() {
     </>
   );
 }
-
