@@ -74,8 +74,6 @@ export default function AdminLayout() {
 
       try {
         const res = await api.get(`${API_BASE_URL}/getAllProduct`);
-        console.log(res, "check res getproduct");
-
         const data = res.data;
         const list = data.getProduct || [];
         if (!cancelled) setProducts(list.map(normalizeProduct));
@@ -86,11 +84,8 @@ export default function AdminLayout() {
 
       try {
         const res = await api.get(`${ORDERS_API_URL}/getAllOrders`);
-        console.log(res, "order res check");
         const data = res.data
         const list = data.order || [];
-        console.log(list, "get all orders=====>");
-
         if (!cancelled) setOrders(list.map(normalizeOrder));
       } catch (err) {
         console.error("Failed to load orders:", err.message);
@@ -129,7 +124,6 @@ export default function AdminLayout() {
     const channel = pusherClient.subscribe("admin-orders");
 
     channel.bind("order-updated", (data) => {
-      console.log("Pusher event received: in admin layout", data);
       setOrders((prev) =>
         prev.map((o) =>
           o.id === data.orderId
@@ -139,7 +133,15 @@ export default function AdminLayout() {
       );
     });
 
+    channel.bind("new-order", (data) => {
+      setOrders((prev) => {
+        if (prev.some((o) => o.id === data._id)) return prev;
+        return [normalizeOrder(data), ...prev];
+      });
+    });
+
     return () => {
+      channel.unbind_all();
       pusherClient.unsubscribe("admin-orders");
     };
   }, []);

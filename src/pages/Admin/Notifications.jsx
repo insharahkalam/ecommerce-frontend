@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-    Bell,
-    Package,
-    AlertTriangle,
-    UserPlus,
-    Circle,
-    BadgeCheck,
-} from "lucide-react";
+import { Bell, Package, AlertTriangle, UserPlus, Circle, BadgeCheck } from "lucide-react";
 import api from "../../config/axios";
 import pusherClient from "../../config/pusher";
 import { NOTIFICATION_API_URL } from "../../data/mockData";
