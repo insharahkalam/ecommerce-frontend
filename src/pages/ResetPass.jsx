@@ -45,7 +45,6 @@ export default function ResetPass() {
         }
     };
 
-    // Password strength (0-3)
     const strength =
         password.length === 0
             ? 0

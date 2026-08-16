@@ -10,9 +10,9 @@ const App = () => {
         toastOptions={{
           duration: 2000,
           style: {
-            background: "#171717", // neutral-900
-            color: "#fafafa", // neutral-50
-            border: "1px solid #262626", // neutral-800
+            background: "var(--color-surface)",
+            color: "var(--color-text)",
+            border: "1px solid var(--color-border)",
             padding: "12px 16px",
             borderRadius: "10px",
             fontSize: "14px",
@@ -20,8 +20,8 @@ const App = () => {
           },
           success: {
             iconTheme: {
-              primary: "#f97316", // orange-500
-              secondary: "#171717",
+              primary: "#f97316",
+              secondary: "var(--color-surface)",
             },
             style: {
               border: "1px solid #f97316",
@@ -29,8 +29,8 @@ const App = () => {
           },
           error: {
             iconTheme: {
-              primary: "#ef4444", // red-500
-              secondary: "#171717",
+              primary: "#ef4444", 
+              secondary: "var(--color-surface)",
             },
             style: {
               border: "1px solid #ef4444",
@@ -39,7 +39,7 @@ const App = () => {
           loading: {
             iconTheme: {
               primary: "#f97316",
-              secondary: "#171717",
+              secondary: "var(--color-surface)",
             },
           },
         }}

@@ -1,8 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
+    const { isLoggedIn } = useAuth();
+    const navigate = useNavigate();
+
     const [cart, setCart] = useState(() => {
         try {
             return JSON.parse(localStorage.getItem("cart")) || [];
@@ -16,6 +22,12 @@ export function CartProvider({ children }) {
     }, [cart]);
 
     function addToCart(product, quantity = 1) {
+        if (!isLoggedIn) {
+            toast.error("Please login first to buy");
+            navigate("/login");
+            return;
+        }
+
         setCart((prev) => {
             const existing = prev.find((i) => i.productId === product.id);
             if (existing) {

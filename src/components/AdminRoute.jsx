@@ -7,7 +7,7 @@ import AccessDenied from "./AccessDenied";
 
 export default function AdminRoute({ children }) {
     const { isLoggedIn } = useAuth();
-    const [status, setStatus] = useState("loading"); // loading | authorized | unauthorized | unauthenticated
+    const [status, setStatus] = useState("loading");
 
     useEffect(() => {
         if (!isLoggedIn) {

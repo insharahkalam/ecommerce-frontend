@@ -26,20 +26,21 @@ import About from '../pages/customer/About';
 import Contact from '../pages/customer/Contact';
 import NotificationsPage from '../pages/Admin/Notifications';
 import AdminRoute from '../components/AdminRoute';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const Routing = () => {
     return (
         <AuthProvider>
-            <CartProvider>
-                <BrowserRouter>
+            <BrowserRouter>
+                <CartProvider>
                     <Routes>
 
                         <Route element={<PublicLayout />}>
                             <Route path='/home' element={<Home />} />
                             <Route path='/product/:id' element={<ProductDetail />} />
                             <Route path='/cart' element={<Cart />} />
-                            <Route path='/checkout' element={<Checkout />} />
-                            <Route path='/my-orders' element={<MyOrders />} />
+                            <Route path='/checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                            <Route path='/my-orders' element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
                             <Route path="/shop" element={<Shop />} />
                             <Route path="/about" element={<About />} />
                             <Route path="/contact" element={<Contact />} />
@@ -61,8 +62,8 @@ const Routing = () => {
                             <Route path='/notifications' element={<NotificationsPage />} />
                         </Route>
                     </Routes>
-                </BrowserRouter>
-            </CartProvider>
+                </CartProvider>
+            </BrowserRouter>
         </AuthProvider>
     )
 }
