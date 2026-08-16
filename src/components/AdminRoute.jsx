@@ -2,13 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import api from "../config/axios";
 import { AUTH_BASE_URL } from "../data/mockData";
+import { useAuth } from "../context/AuthContext";
 import AccessDenied from "./AccessDenied";
 
 export default function AdminRoute({ children }) {
-    const [status, setStatus] = useState("loading");
+    const { isLoggedIn } = useAuth();
+    const [status, setStatus] = useState("loading"); // loading | authorized | unauthorized | unauthenticated
 
     useEffect(() => {
+        if (!isLoggedIn) {
+            setStatus("unauthenticated");
+            return;
+        }
+
         let cancelled = false;
+        setStatus("loading");
+
         (async () => {
             try {
                 const res = await api.get(`${AUTH_BASE_URL}/getMe`);
@@ -19,8 +28,9 @@ export default function AdminRoute({ children }) {
                 if (!cancelled) setStatus("unauthenticated");
             }
         })();
+
         return () => { cancelled = true; };
-    }, []);
+    }, [isLoggedIn]);
 
     if (status === "loading") {
         return (
