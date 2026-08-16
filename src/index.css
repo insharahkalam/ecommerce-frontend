@@ -9,6 +9,27 @@
     --color-border: rgb(0 0 0 / 0.1);
     --color-hover: rgb(0 0 0 / 0.06);
     --color-danger: #fa2929;
+
+    --status-pending: #B45309;
+    --status-processing: #0369A1;
+    --status-shipped: #7C3AED;
+    --status-delivered: #15803D;
+    --status-cancelled: #B91C1C;
+    --status-neutral: #52525B;
+
+    --status-pending-bg: rgba(180, 83, 9, 0.10);
+    --status-processing-bg: rgba(3, 105, 161, 0.10);
+    --status-shipped-bg: rgba(124, 58, 237, 0.10);
+    --status-delivered-bg: rgba(21, 128, 61, 0.10);
+    --status-cancelled-bg: rgba(185, 28, 28, 0.10);
+    --status-neutral-bg: rgba(0, 0, 0, 0.05);
+
+    --status-pending-border: rgba(180, 83, 9, 0.35);
+    --status-processing-border: rgba(3, 105, 161, 0.35);
+    --status-shipped-border: rgba(124, 58, 237, 0.35);
+    --status-delivered-border: rgba(21, 128, 61, 0.35);
+    --status-cancelled-border: rgba(185, 28, 28, 0.35);
+    --status-neutral-border: rgba(0, 0, 0, 0.12);
 }
 
 .dark {
@@ -19,6 +40,28 @@
     --color-border: rgb(255 255 255 / 0.1);
     --color-hover: rgb(255 255 255 / 0.06);
     --color-danger: #fa2929;
+
+    /* Status badge colors — dark mode: original pastel/bright shades */
+    --status-pending: #FBBF24;
+    --status-processing: #38BDF8;
+    --status-shipped: #A78BFA;
+    --status-delivered: #4ADE80;
+    --status-cancelled: #F87171;
+    --status-neutral: #A3A3A3;
+
+    --status-pending-bg: rgba(251, 191, 36, 0.12);
+    --status-processing-bg: rgba(56, 189, 248, 0.12);
+    --status-shipped-bg: rgba(167, 139, 250, 0.12);
+    --status-delivered-bg: rgba(74, 222, 128, 0.12);
+    --status-cancelled-bg: rgba(248, 113, 113, 0.12);
+    --status-neutral-bg: rgba(255, 255, 255, 0.05);
+
+    --status-pending-border: rgba(251, 191, 36, 0.3);
+    --status-processing-border: rgba(56, 189, 248, 0.3);
+    --status-shipped-border: rgba(167, 139, 250, 0.3);
+    --status-delivered-border: rgba(74, 222, 128, 0.3);
+    --status-cancelled-border: rgba(248, 113, 113, 0.3);
+    --status-neutral-border: rgba(255, 255, 255, 0.1);
 }
 
 @theme inline {

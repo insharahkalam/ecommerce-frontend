@@ -79,6 +79,7 @@ import Shop from '../pages/customer/Shop';
 import About from '../pages/customer/About';
 import Contact from '../pages/customer/Contact';
 import NotificationsPage from '../pages/Admin/Notifications';
+import AdminRoute from '../components/AdminRoute';
 
 const Routing = () => {
     return (
@@ -86,8 +87,7 @@ const Routing = () => {
             <CartProvider>
                 <BrowserRouter>
                     <Routes>
-                        {/* Public / customer-facing routes — wrapped in PublicLayout
-                            so header, cart icon, login menu appear everywhere */}
+
                         <Route element={<PublicLayout />}>
                             <Route path='/home' element={<Home />} />
                             <Route path='/product/:id' element={<ProductDetail />} />
@@ -97,11 +97,6 @@ const Routing = () => {
                             <Route path="/shop" element={<Shop />} />
                             <Route path="/about" element={<About />} />
                             <Route path="/contact" element={<Contact />} />
-
-
-
-
-
                         </Route>
 
                         {/* Auth routes — no header/layout needed */}
@@ -111,7 +106,7 @@ const Routing = () => {
                         <Route path='/reset-password/:token' element={<ResetPass />} />
 
                         {/* Admin routes */}
-                        <Route element={<AdminLayout />}>
+                        <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
                             <Route path='/adminDashboard' element={<AdminDashboard />} />
                             <Route path='/orders' element={<Order />} />
                             <Route path='/customers' element={<Customers />} />
