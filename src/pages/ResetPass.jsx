@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Logo2, Field, inputClass, EyeIcon } from "../components/Shared";
+import { Field, inputClass, EyeIcon } from "../components/Shared";
 import api from "../config/axios";
 import toast from "react-hot-toast";
+import logo from "../assets/logo.png"
 
 export default function ResetPass() {
     const { token } = useParams();
@@ -82,7 +83,28 @@ export default function ResetPass() {
                 <div className="rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-white/10 to-transparent shadow-[0_20px_80px_-20px_rgba(249,115,22,0.35)]">
                     <div className="bg-neutral-950/90 backdrop-blur-xl rounded-2xl px-8 py-10">
                         <div className="flex justify-center">
-                            <Logo2 />
+                            <Link to="/" className="group flex shrink-0 items-center gap-2">
+                                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-r from-orange-400 to-amber-300 p-[2px] ">
+                                    <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white">
+                                        <img
+                                            src={logo}
+                                            alt="UrbanTraders"
+                                            width={40}
+                                            height={40}
+                                            className="h-11 w-11 object-contain"
+                                        />
+                                    </span>
+                                </span>
+
+                                <span className="flex flex-col leading-none">
+                                    <span className="font-serif text-[19px] font-extrabold tracking-[-0.03em text-white">
+                                        Urban<span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Traders</span>
+                                    </span>
+                                    <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[0.28em] text-neutral-400 dark:text-neutral-500 sm:block">
+                                        Shop Smart
+                                    </span>
+                                </span>
+                            </Link>
                         </div>
 
                         {success ? (
