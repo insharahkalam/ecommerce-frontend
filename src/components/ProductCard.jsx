@@ -28,14 +28,11 @@ export default function ProductCard({ p, onAdd }) {
   const lowStock = p.stock > 0 && p.stock <= 5;
   const outOfStock = p.stock === 0;
 
-  console.log(p, "check products");
-
-
   return (
     <GlassCard className="group/card flex h-full flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10">
       {/* Image area */}
       <Link to={`/product/${p.id}`} className="relative block">
-        <div className="aspect-square w-full overflow-hidden bg-muted">
+        <div className="aspect-[4/3] w-full overflow-hidden bg-hover">
           {p.image ? (
             <img
               src={p.image}
@@ -45,16 +42,15 @@ export default function ProductCard({ p, onAdd }) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <ShoppingBag size={28} className="text-muted-foreground" />
+              <ShoppingBag size={28} className="text-text-muted" />
             </div>
           )}
         </div>
 
         {/* Top-left badges */}
-        <div className="absolute left-2.5 top-2.5 flex flex-col gap-1.5">
+        <div className="absolute left-2 top-2 flex flex-col gap-1">
           {p.discount > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-lg bg-orange-500 px-2 py-1 text-[11px] font-semibold text-white shadow-sm">
-              <BadgePercent size={12} />
+            <span className="inline-flex items-center gap-1 rounded-lg bg-orange-700 px-2 py-1 text-[11px] font-bold text-white shadow-sm">
               {p.discount}% OFF
             </span>
           )}
@@ -67,14 +63,14 @@ export default function ProductCard({ p, onAdd }) {
 
         {/* Top-right featured badge */}
         {p.featured && (
-          <span className="absolute right-2.5 top-2.5 rounded-lg bg-black/60 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-orange-300 backdrop-blur-sm">
+          <span className="absolute right-2 top-2  rounded-lg bg-transparent  px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-orange-500 backdrop-blur-sm">
             Featured
           </span>
         )}
 
         {/* Out of stock overlay */}
         {outOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-bg/60 backdrop-blur-[2px]">
             <span className="rounded-lg bg-black/70 px-3 py-1.5 text-xs font-semibold text-white">
               Out of Stock
             </span>
@@ -83,39 +79,43 @@ export default function ProductCard({ p, onAdd }) {
       </Link>
 
       {/* Content area */}
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
+      <div className="flex flex-1 flex-col gap-1.5 p-2.5">
 
         {/* Category & Brand */}
-        <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-          {p.category && (
-            <span className="font-medium uppercase tracking-wide">
-              {p.category}
-            </span>
-          )}
+        {(p.category || p.brand) && (
+          <div className="flex items-center gap-1.5 text-[10px] text-text-muted">
+            {p.category && (
+              <span className="font-medium uppercase tracking-wide">
+                {p.category}
+              </span>
+            )}
 
-          {p.category && p.brand && (
-            <span className="text-muted-foreground/40">•</span>
-          )}
+            {p.category && p.brand && (
+              <span className="text-text-muted/40">•</span>
+            )}
 
-          {p.brand && (
-            <span className="font-medium">
-              {p.brand}
-            </span>
-          )}
-        </div>
+            {p.brand && (
+              <span className="font-medium">
+                {p.brand}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Title & Description */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5">
           <Link
             to={`/product/${p.id}`}
-            className="line-clamp-1 font-serif text-md font-bold leading-snug text-foreground transition-colors hover:text-orange-400"
+            className="line-clamp-1 font-serif text-sm font-bold leading-snug text-text transition-colors hover:text-orange-400"
           >
             {p.name}
           </Link>
 
-          <p className="line-clamp-2 text-xs text-muted-foreground/80">
-            {p.description}
-          </p>
+          {p.description && (
+            <p className="line-clamp-2 text-xs text-text-muted/80">
+              {p.description}
+            </p>
+          )}
         </div>
 
         {/* Rating + Reviews + Sold */}
@@ -127,11 +127,11 @@ export default function ProductCard({ p, onAdd }) {
               {[1, 2, 3, 4, 5].map((i) => (
                 <Star
                   key={i}
-                  size={12}
+                  size={11}
                   className={
                     i <= Math.round(rating)
                       ? "text-amber-400"
-                      : "text-muted-foreground/40"
+                      : "text-text-muted/40"
                   }
                   fill={
                     i <= Math.round(rating)
@@ -142,23 +142,23 @@ export default function ProductCard({ p, onAdd }) {
               ))}
             </div>
 
-            <span className="text-[11px] font-medium text-muted-foreground">
+            <span className="text-[11px] font-medium text-text-muted">
               {rating.toFixed(1)}
             </span>
 
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-[11px] text-text-muted">
               ({reviews})
             </span>
           </div>
 
           {/* Divider */}
           {p.sold > 0 && (
-            <span className="text-muted-foreground/30">|</span>
+            <span className="text-text-muted/30">|</span>
           )}
 
           {/* Sold */}
           {p.sold > 0 && (
-            <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+            <span className="flex items-center gap-1 text-[11px] text-text-muted">
               <Flame size={12} className="text-orange-400" />
               {formatSold(p.sold)} sold
             </span>
@@ -167,16 +167,14 @@ export default function ProductCard({ p, onAdd }) {
 
         {/* Price + Discount */}
         <div className="flex items-center gap-2">
-          <span className=" font-serif font-extrabold text-foreground">
+          <span className="font-serif font-extrabold text-text">
             {formatPKR(discounted)}
           </span>
 
           {p.discount > 0 && (
-            <>
-              <del className="text-[12px] font-serif font-bold text-red-400">
-                {formatPKR(p.price)}
-              </del>
-            </>
+            <del className="text-[12px] font-serif font-bold text-red-400">
+              {formatPKR(p.price)}
+            </del>
           )}
         </div>
 
@@ -184,7 +182,7 @@ export default function ProductCard({ p, onAdd }) {
         <button
           onClick={() => onAdd?.(p)}
           disabled={outOfStock}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-2.5 text-sm font-medium text-white transition-all hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
+          className="mt-0.5 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-2 text-sm font-medium text-white transition-all hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-hover disabled:text-text-muted"
         >
           <ShoppingBag size={15} />
           {outOfStock ? "Out of stock" : "Add to cart"}
@@ -192,6 +190,6 @@ export default function ProductCard({ p, onAdd }) {
 
       </div>
 
-    </GlassCard >
+    </GlassCard>
   );
 }

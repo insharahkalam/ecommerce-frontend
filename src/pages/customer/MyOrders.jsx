@@ -18,8 +18,6 @@ const FLOW = [
     { key: "Delivered", label: "Delivered", icon: CheckCircle2 },
 ];
 
-const ACCENT = "#FB923C";
-
 // Formats a number as Pakistani Rupees, e.g. Rs. 12,500
 const formatPKR = (amount) =>
     `Rs. ${Number(amount).toLocaleString("en-PK", {
@@ -33,7 +31,7 @@ function OrderProgress({ status }) {
         return (
             <div className="flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/[0.06] px-3.5 py-2.5">
                 <XCircle size={15} className="text-rose-400 shrink-0" />
-                <span className="font-serif text-xs text-rose-300/90">
+                <span className="font-serif text-xs text-rose-400/90">
                     This order was cancelled. Any amount charged is refunded to the original method.
                 </span>
             </div>
@@ -55,35 +53,28 @@ function OrderProgress({ status }) {
                         <div className="flex flex-col items-center gap-2 shrink-0 w-[68px] sm:w-[88px]">
                             <span className="relative flex items-center justify-center">
                                 {current && (
-                                    <span
-                                        className="absolute inset-0 rounded-full animate-ping"
-                                        style={{ background: "rgba(251,146,60,0.25)" }}
-                                    />
+                                    <span className="absolute inset-0 rounded-full animate-ping bg-orange-400/25" />
                                 )}
                                 <span
-                                    className="relative w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300"
-                                    style={{
-                                        background: done ? "rgba(251,146,60,0.14)" : "rgba(255,255,255,0.03)",
-                                        borderColor: done ? "rgba(251,146,60,0.55)" : "rgba(255,255,255,0.10)",
-                                    }}
+                                    className={`relative w-8 h-8 rounded-full flex items-center justify-center border transition-colors duration-300 ${done
+                                        ? "bg-orange-400/15 border-orange-400/55"
+                                        : "bg-hover border-border"
+                                        }`}
                                 >
-                                    <Icon size={14} color={done ? ACCENT : "#525252"} />
+                                    <Icon size={14} className={done ? "text-orange-400" : "text-text-muted"} />
                                 </span>
                             </span>
                             <span
-                                className="font-serif text-[10.5px] leading-tight text-center tracking-wide"
-                                style={{ color: done ? "#D4D4D4" : "#525252" }}
+                                className={`font-serif text-[10.5px] leading-tight text-center tracking-wide ${done ? "text-text" : "text-text-muted"
+                                    }`}
                             >
                                 {step.label}
                             </span>
                         </div>
                         {!isLast && (
                             <div
-                                className="h-px flex-1 mt-4 transition-colors duration-300"
-                                style={{
-                                    background:
-                                        i < activeIdx ? "rgba(251,146,60,0.5)" : "rgba(255,255,255,0.08)",
-                                }}
+                                className={`h-px flex-1 mt-4 transition-colors duration-300 ${i < activeIdx ? "bg-orange-400/50" : "bg-border"
+                                    }`}
                             />
                         )}
                     </React.Fragment>
@@ -96,19 +87,19 @@ function OrderProgress({ status }) {
 /* ------------------------------- Small building blocks ------------------------------- */
 function StatTile({ icon: Icon, label, value, hint }) {
     return (
-        <div className="flex-1 min-w-[150px] rounded-2xl border border-white/[0.07] bg-white/[0.025] px-4 py-3.5">
-            <div className="flex items-center gap-1.5 text-neutral-500">
+        <div className="flex-1 min-w-[150px] rounded-2xl border border-border bg-surface px-4 py-3.5">
+            <div className="flex items-center gap-1.5 text-text-muted">
                 <Icon size={13} />
                 <span className="font-serif text-[11px] uppercase tracking-[0.14em]">{label}</span>
             </div>
-            <p className="font-mono text-xl text-white mt-2 leading-none">{value}</p>
-            {hint && <p className="font-serif text-[11px] text-neutral-600 mt-1.5">{hint}</p>}
+            <p className="font-mono text-xl text-text mt-2 leading-none">{value}</p>
+            {hint && <p className="font-serif text-[11px] text-text-muted mt-1.5">{hint}</p>}
         </div>
     );
 }
 
 function OrderCardSkeleton() {
-    return <div className="h-44 rounded-2xl bg-white/[0.03] border border-white/5 animate-pulse" />;
+    return <div className="h-44 rounded-2xl bg-hover border border-border animate-pulse" />;
 }
 
 /* -------------------------------------- Page -------------------------------------- */
@@ -122,26 +113,10 @@ export default function MyOrders() {
 
     useEffect(() => {
         if (!userId) return;
-        console.log("Frontend userId:", userId);
-
-        pusherClient.connection.bind("connected", () => {
-            console.log("✅ Pusher connected");
-        });
-        pusherClient.connection.bind("error", (err) => {
-            console.log("❌ Pusher connection error:", err);
-        });
 
         const channel = pusherClient.subscribe(`user-${userId}`);
 
-        channel.bind("pusher:subscription_succeeded", () => {
-            console.log("✅ Subscribed to channel:", `user-${userId}`);
-        });
-        channel.bind("pusher:subscription_error", (err) => {
-            console.log("❌ Subscription error:", err);
-        });
-
         channel.bind("order-updated", (data) => {
-            console.log("📩 Event received:", data);
             setOrders((prev) =>
                 prev.map((o) =>
                     o._id === data.orderId
@@ -201,8 +176,8 @@ export default function MyOrders() {
     if (loading) {
         return (
             <div className="flex flex-col gap-4 max-w-4xl mx-auto">
-                <div className="h-10 w-56 rounded-lg bg-white/[0.03] animate-pulse" />
-                <div className="h-20 rounded-2xl bg-white/[0.03] animate-pulse" />
+                <div className="h-10 w-56 rounded-lg bg-hover animate-pulse" />
+                <div className="h-20 rounded-2xl bg-hover animate-pulse" />
                 {[1, 2, 3].map((i) => (
                     <OrderCardSkeleton key={i} />
                 ))}
@@ -214,13 +189,13 @@ export default function MyOrders() {
     if (orders.length === 0) {
         return (
             <div className="max-w-4xl mx-auto">
-                <div className="rounded-3xl border border-white/[0.07] bg-white/[0.02] px-6 py-20 text-center flex flex-col items-center gap-5">
-                    <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center">
-                        <Package size={26} color="#525252" />
+                <div className="rounded-3xl border border-border bg-surface px-6 py-20 text-center flex flex-col items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-hover border border-border flex items-center justify-center">
+                        <Package size={26} className="text-text-muted" />
                     </div>
                     <div>
-                        <p className="font-display italic text-2xl text-white">No orders yet</p>
-                        <p className="font-serif text-sm text-neutral-500 mt-2 max-w-sm mx-auto leading-relaxed">
+                        <p className="font-display italic text-2xl text-text">No orders yet</p>
+                        <p className="font-serif text-sm text-text-muted mt-2 max-w-sm mx-auto leading-relaxed">
                             Once you place your first order, you'll be able to follow it here from
                             confirmation through to delivery — with receipts kept on file.
                         </p>
@@ -244,10 +219,10 @@ export default function MyOrders() {
                 <span className="font-serif text-[11px] uppercase tracking-[0.22em] text-orange-400/80">
                     Order history
                 </span>
-                <h1 className="font-display italic text-4xl font-semibold text-white">
+                <h1 className="font-display italic text-4xl font-semibold text-text">
                     Your orders
                 </h1>
-                <p className="font-serif text-sm text-neutral-500 max-w-xl leading-relaxed">
+                <p className="font-serif text-sm text-text-muted max-w-xl leading-relaxed">
                     A complete record of every purchase, with live fulfilment status, itemised
                     breakdowns and payment details — kept in one place.
                 </p>
@@ -286,20 +261,13 @@ export default function MyOrders() {
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-serif border transition-all duration-200 flex items-center gap-1.5"
-                                style={{
-                                    background: active ? "rgba(249,115,22,0.14)" : "transparent",
-                                    color: active ? "#FB923C" : "#A3A3A3",
-                                    borderColor: active
-                                        ? "rgba(249,115,22,0.35)"
-                                        : "rgba(255,255,255,0.1)",
-                                }}
+                                className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-serif border transition-all duration-200 flex items-center gap-1.5 ${active
+                                    ? "bg-orange-500/[0.14] text-orange-400 border-orange-500/35"
+                                    : "bg-transparent text-text-muted border-border"
+                                    }`}
                             >
                                 {f}
-                                <span
-                                    className="font-mono text-[10px]"
-                                    style={{ color: active ? "#FDBA74" : "#737373" }}
-                                >
+                                <span className={`font-mono text-[10px] ${active ? "text-orange-300" : "text-text-muted"}`}>
                                     {count}
                                 </span>
                             </button>
@@ -309,7 +277,7 @@ export default function MyOrders() {
             </div>
 
             {filtered.length === 0 && (
-                <p className="text-neutral-500 font-serif text-sm py-10 text-center">
+                <p className="text-text-muted font-serif text-sm py-10 text-center">
                     No orders match this status yet.
                 </p>
             )}
@@ -326,14 +294,14 @@ export default function MyOrders() {
                         <GlassCard key={o._id}>
                             <div className="flex flex-col">
                                 {/* Top bar: reference + status */}
-                                <div className="flex items-center justify-between gap-3 flex-wrap px-5 sm:px-6 py-3 border-b border-white/[0.07]">
+                                <div className="flex items-center justify-between gap-3 flex-wrap px-5 sm:px-6 py-3 border-b border-border">
                                     <div className="flex items-center gap-2.5">
-                                        <Receipt size={14} color="#737373" />
-                                        <span className="font-mono text-[11px] tracking-wider text-neutral-400">
+                                        <Receipt size={14} className="text-text-muted" />
+                                        <span className="font-mono text-[11px] tracking-wider text-text-muted">
                                             #{o._id.slice(-8).toUpperCase()}
                                         </span>
-                                        <span className="text-neutral-700">|</span>
-                                        <span className="font-serif text-xs text-neutral-500">
+                                        <span className="text-text-muted/40">|</span>
+                                        <span className="font-serif text-xs text-text-muted">
                                             {new Date(o.createdAt).toLocaleDateString("en-US", {
                                                 month: "short",
                                                 day: "numeric",
@@ -359,7 +327,7 @@ export default function MyOrders() {
                                                 {o.items.slice(0, 3).map((i, idx) => (
                                                     <div
                                                         key={idx}
-                                                        className="w-11 h-11 rounded-xl overflow-hidden ring-2 ring-[#141414] bg-white/[0.05]"
+                                                        className="w-11 h-11 rounded-xl overflow-hidden ring-2 ring-bg bg-hover"
                                                     >
                                                         {i.image ? (
                                                             <img
@@ -369,40 +337,40 @@ export default function MyOrders() {
                                                             />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center">
-                                                                <ShoppingBag size={14} color="#525252" />
+                                                                <ShoppingBag size={14} className="text-text-muted" />
                                                             </div>
                                                         )}
                                                     </div>
                                                 ))}
                                                 {o.items.length > 3 && (
-                                                    <div className="w-11 h-11 rounded-xl ring-2 ring-[#141414] bg-white/[0.06] flex items-center justify-center">
-                                                        <span className="text-[11px] font-mono text-neutral-400">
+                                                    <div className="w-11 h-11 rounded-xl ring-2 ring-bg bg-hover flex items-center justify-center">
+                                                        <span className="text-[11px] font-mono text-text-muted">
                                                             +{o.items.length - 3}
                                                         </span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-serif text-sm text-neutral-200">
+                                                <p className="font-serif text-sm text-text">
                                                     {o.items[0]?.title || "Order items"}
                                                     {o.items.length > 1 && (
-                                                        <span className="text-neutral-500">
+                                                        <span className="text-text-muted">
                                                             {" "}
                                                             and {o.items.length - 1} more
                                                         </span>
                                                     )}
                                                 </p>
-                                                <p className="font-serif text-xs text-neutral-500 mt-0.5">
+                                                <p className="font-serif text-xs text-text-muted mt-0.5">
                                                     {totalItems} {totalItems === 1 ? "item" : "items"} in this
                                                     order
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <p className="font-mono text-xl text-white leading-none">
+                                            <p className="font-mono text-xl text-text leading-none">
                                                 {formatPKR(o.totalAmount)}
                                             </p>
-                                            <p className="font-serif text-[11px] text-neutral-500 mt-1.5">
+                                            <p className="font-serif text-[11px] text-text-muted mt-1.5">
                                                 order total
                                             </p>
                                         </div>
@@ -414,7 +382,7 @@ export default function MyOrders() {
                                 {/* Expand */}
                                 <button
                                     onClick={() => setExpanded(isOpen ? null : o._id)}
-                                    className="flex items-center justify-center gap-1.5 text-xs font-serif text-neutral-400 hover:text-orange-300 transition-colors py-3 border-t border-white/[0.07]"
+                                    className="flex items-center justify-center gap-1.5 text-xs font-serif text-text-muted hover:text-orange-300 transition-colors py-3 border-t border-border"
                                 >
                                     {isOpen ? "Hide order details" : "View order details"}
                                     {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -422,14 +390,14 @@ export default function MyOrders() {
 
                                 {isOpen && (
                                     <div className="px-5 sm:px-6 pb-5 pt-1">
-                                        <div className="flex items-center justify-between font-serif text-[10.5px] uppercase tracking-[0.14em] text-neutral-600 pb-2 border-b border-white/[0.06]">
+                                        <div className="flex items-center justify-between font-serif text-[10.5px] uppercase tracking-[0.14em] text-text-muted pb-2 border-b border-border">
                                             <span>Item</span>
                                             <span>Amount</span>
                                         </div>
-                                        <div className="flex flex-col divide-y divide-white/[0.06]">
+                                        <div className="flex flex-col divide-y divide-border">
                                             {o.items.map((item, i) => (
                                                 <div key={i} className="flex items-center gap-3 py-3">
-                                                    <div className="w-9 h-9 rounded-lg overflow-hidden ring-1 ring-white/10 bg-white/[0.04] shrink-0">
+                                                    <div className="w-9 h-9 rounded-lg overflow-hidden ring-1 ring-border bg-hover shrink-0">
                                                         {item.image ? (
                                                             <img
                                                                 src={item.image}
@@ -438,27 +406,27 @@ export default function MyOrders() {
                                                             />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center">
-                                                                <ShoppingBag size={12} color="#525252" />
+                                                                <ShoppingBag size={12} className="text-text-muted" />
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <span className="flex-1 text-sm font-serif text-neutral-300 truncate">
+                                                    <span className="flex-1 text-sm font-serif text-text truncate">
                                                         {item.title}
                                                     </span>
-                                                    <span className="text-xs font-mono text-neutral-500 shrink-0">
+                                                    <span className="text-xs font-mono text-text-muted shrink-0">
                                                         × {item.quantity}
                                                     </span>
-                                                    <span className="text-xs font-mono text-white shrink-0 w-16 text-right">
+                                                    <span className="text-xs font-mono text-text shrink-0 w-16 text-right">
                                                         {formatPKR(item.price * item.quantity)}
                                                     </span>
                                                 </div>
                                             ))}
                                         </div>
-                                        <div className="flex items-center justify-between pt-3 mt-1 border-t border-white/10">
-                                            <span className="font-serif text-xs text-neutral-400">
+                                        <div className="flex items-center justify-between pt-3 mt-1 border-t border-border">
+                                            <span className="font-serif text-xs text-text-muted">
                                                 Total charged
                                             </span>
-                                            <span className="font-mono text-sm text-white">
+                                            <span className="font-mono text-sm text-text">
                                                 {formatPKR(o.totalAmount)}
                                             </span>
                                         </div>
@@ -472,20 +440,20 @@ export default function MyOrders() {
 
             {/* Support footer */}
             {filtered.length > 0 && (
-                <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] px-5 py-5 flex items-center gap-4 flex-wrap">
+                <div className="rounded-2xl border border-border bg-surface px-5 py-5 flex items-center gap-4 flex-wrap">
                     <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-400/25 flex items-center justify-center shrink-0">
-                        <LifeBuoy size={17} color={ACCENT} />
+                        <LifeBuoy size={17} className="text-orange-400" />
                     </div>
                     <div className="flex-1 min-w-[220px]">
-                        <p className="font-serif text-sm text-neutral-200">Need help with an order?</p>
-                        <p className="font-serif text-xs text-neutral-500 mt-1 leading-relaxed">
+                        <p className="font-serif text-sm text-text">Need help with an order?</p>
+                        <p className="font-serif text-xs text-text-muted mt-1 leading-relaxed">
                             Our support team can assist with delivery updates, returns and refunds —
                             usually within one business day.
                         </p>
                     </div>
                     <Link
                         to="/shop"
-                        className="rounded-full border border-white/10 px-4 py-1.5 text-xs font-serif text-neutral-300 hover:text-orange-300 hover:border-orange-400/40 transition-colors"
+                        className="rounded-full border border-border px-4 py-1.5 text-xs font-serif text-text-muted hover:text-orange-300 hover:border-orange-400/40 transition-colors"
                     >
                         Continue shopping
                     </Link>

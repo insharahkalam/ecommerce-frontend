@@ -21,8 +21,8 @@ export default function Contact() {
         <div className="flex flex-col gap-10">
             <section className="text-center max-w-2xl mx-auto pt-8">
                 <p className="font-mono text-xs text-orange-400 tracking-widest">GET IN TOUCH</p>
-                <h1 className="font-display italic text-4xl sm:text-5xl font-semibold text-white mt-3">Contact us</h1>
-                <p className="mt-4 font-serif text-neutral-400">
+                <h1 className="font-display italic text-4xl sm:text-5xl font-semibold text-text mt-3">Contact us</h1>
+                <p className="mt-4 font-serif text-text-muted">
                     Have a question, feedback, or business inquiry? We'd love to hear from you.
                 </p>
             </section>
@@ -31,36 +31,36 @@ export default function Contact() {
                 {/* Info cards */}
                 <div className="flex flex-col gap-4">
                     {info.map((I) => (
-                        <div key={I.label} className="p-5 rounded-2xl border border-white/10 bg-white/[0.03] flex items-start gap-3">
+                        <div key={I.label} className="p-5 rounded-2xl border border-border bg-surface flex items-start gap-3">
                             <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400">
                                 <I.icon size={18} />
                             </div>
                             <div>
-                                <p className="text-xs font-mono uppercase tracking-wider text-neutral-500">{I.label}</p>
-                                <p className="text-sm font-serif text-white mt-1">{I.value}</p>
+                                <p className="text-xs font-mono uppercase tracking-wider text-text-muted">{I.label}</p>
+                                <p className="text-sm font-serif text-text mt-1">{I.value}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
                 {/* Form */}
-                <form onSubmit={submit} className="lg:col-span-2 p-6 sm:p-8 rounded-2xl border border-white/10 bg-white/[0.03] flex flex-col gap-4">
+                <form onSubmit={submit} className="lg:col-span-2 p-6 sm:p-8 rounded-2xl border border-border bg-surface flex flex-col gap-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="text-xs font-mono uppercase tracking-wider text-neutral-500">Name</label>
+                            <label className="text-xs font-mono uppercase tracking-wider text-text-muted">Name</label>
                             <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                className="mt-1 w-full px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm font-serif text-white focus:outline-none focus:border-orange-500" />
+                                className="mt-1 w-full px-3 py-2.5 rounded-lg bg-hover border border-border text-sm font-serif text-text focus:outline-none focus:border-orange-500" />
                         </div>
                         <div>
-                            <label className="text-xs font-mono uppercase tracking-wider text-neutral-500">Email</label>
+                            <label className="text-xs font-mono uppercase tracking-wider text-text-muted">Email</label>
                             <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                className="mt-1 w-full px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm font-serif text-white focus:outline-none focus:border-orange-500" />
+                                className="mt-1 w-full px-3 py-2.5 rounded-lg bg-hover border border-border text-sm font-serif text-text focus:outline-none focus:border-orange-500" />
                         </div>
                     </div>
                     <div>
-                        <label className="text-xs font-mono uppercase tracking-wider text-neutral-500">Message</label>
+                        <label className="text-xs font-mono uppercase tracking-wider text-text-muted">Message</label>
                         <textarea required rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
-                            className="mt-1 w-full px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm font-serif text-white focus:outline-none focus:border-orange-500 resize-none" />
+                            className="mt-1 w-full px-3 py-2.5 rounded-lg bg-hover border border-border text-sm font-serif text-text focus:outline-none focus:border-orange-500 resize-none" />
                     </div>
                     <button className="self-start inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-serif transition-colors">
                         <Send size={16} /> Send message

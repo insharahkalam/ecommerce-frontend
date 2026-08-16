@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Logo, SocialButton, GoogleIcon, Field, inputClass, EyeIcon } from "../components/Shared";
+import { Logo2, SocialButton, GoogleIcon, Field, inputClass, EyeIcon } from "../components/Shared";
 import loginImg from "../assets/login.jpg";
 import api from "../config/axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,7 +27,7 @@ export default function Login() {
         try {
             setLoading(true);
             const res = await api.post("/authentication/login", formData);
-            
+
             const loggedInUser = res?.data?.user || res?.data;
             loginUser(loggedInUser);
 
@@ -67,7 +67,7 @@ export default function Login() {
                     {/* Right form */}
                     <div className="p-8 sm:p-10">
                         <div className="flex justify-center md:justify-start mb-8">
-                            <Logo />
+                            <Logo2 />
                         </div>
 
                         <h1 className="italic font-serif text-2xl sm:text-3xl font-bold tracking-tight">

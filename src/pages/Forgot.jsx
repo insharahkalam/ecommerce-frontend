@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Logo, Field, inputClass } from "../components/Shared";
+import { Logo2, Field, inputClass } from "../components/Shared";
 import api from "../config/axios";
 
 export default function Forgot() {
@@ -44,7 +44,7 @@ export default function Forgot() {
             <div className="relative w-full max-w-md rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-white/10 to-transparent shadow-2xl shadow-orange-500/10">
                 <div className="rounded-2xl bg-neutral-950/90 backdrop-blur-xl p-8 sm:p-10">
                     <div className="flex justify-center mb-8">
-                        <Logo />
+                        <Logo2 />
                     </div>
 
                     {sent ? (

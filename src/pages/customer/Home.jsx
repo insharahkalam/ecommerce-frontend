@@ -23,7 +23,7 @@ function normalizeProduct(p) {
 }
 
 const perks = [
-  { icon: Truck, title: "Free Shipping", desc: "On orders over $50" },
+  { icon: Truck, title: "Fast Delivery", desc: "Fast & reliable delivery" },
   { icon: Shield, title: "Secure Payment", desc: "100% protected checkout" },
   { icon: RotateCcw, title: "Easy Returns", desc: "30-day return policy" },
   { icon: Sparkles, title: "Curated Quality", desc: "Handpicked for you" },
@@ -71,9 +71,6 @@ const stats = [
   { icon: Headphones, value: "120+", label: "Audio & power SKUs" },
 ];
 
-/* Signature motif — a small equalizer, standing in for the site's audio-first
-   catalogue. Used sparingly as a prefix to section eyebrows instead of a
-   generic numbered marker, so it actually says something about the brand. */
 function EqBars({ className = "", bar = "w-[3px]", tall = "h-3.5" }) {
   const heights = ["40%", "100%", "65%", "85%", "50%"];
   return (
@@ -240,8 +237,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Shop by category — cards sit on their own colored gradients,
-          so their text stays white regardless of site theme */}
+
       <section aria-labelledby="category-heading">
         <div className="mb-6 sm:mb-8">
           <Eyebrow>SHOP BY CATEGORY</Eyebrow>

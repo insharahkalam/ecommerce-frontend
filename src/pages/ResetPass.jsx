@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Logo, Field, inputClass, EyeIcon } from "../components/Shared";
+import { Logo2, Field, inputClass, EyeIcon } from "../components/Shared";
 import api from "../config/axios";
 import toast from "react-hot-toast";
 
@@ -82,7 +82,7 @@ export default function ResetPass() {
                 <div className="rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-white/10 to-transparent shadow-[0_20px_80px_-20px_rgba(249,115,22,0.35)]">
                     <div className="bg-neutral-950/90 backdrop-blur-xl rounded-2xl px-8 py-10">
                         <div className="flex justify-center">
-                            <Logo />
+                            <Logo2 />
                         </div>
 
                         {success ? (
