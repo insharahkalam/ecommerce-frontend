@@ -173,7 +173,7 @@ export default function ProductCard({ p, onAdd }) {
 
           {p.discount > 0 && (
             <>
-              <del className="text-[12px] font-serif font-bold text-red-500">
+              <del className="text-[12px] font-serif font-bold text-red-400">
                 {formatPKR(p.price)}
               </del>
             </>

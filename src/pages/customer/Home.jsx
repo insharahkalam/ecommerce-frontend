@@ -17,6 +17,8 @@ function normalizeProduct(p) {
     featured: !!p.featured,
     image: p.image,
     category: p.category,
+    brand: p.brand || "",
+    description: p.description || "",
   };
 }
 
