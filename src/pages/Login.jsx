@@ -34,7 +34,7 @@ export default function Login() {
             toast.success(res?.data?.message || "Login successfully!");
             setEmail(""); setPassword("");
             setTimeout(() => {
-                navigate(res.data.isAdmin === true ? "/adminDashboard" : "/home");
+                navigate(res.data.isAdmin === true ? "/adminDashboard" : "/");
             }, 1500);
         } catch (error) {
             toast.error(error?.response?.data?.message || error?.message || "Something went wrong.");
@@ -75,7 +75,7 @@ export default function Login() {
                         </h1>
                         <p className="mt-2 text-sm text-neutral-400">
                             Don't have an account?{" "}
-                            <Link to="/" className="text-orange-500 hover:text-orange-400 hover:underline">
+                            <Link to="/signup" className="text-orange-500 hover:text-orange-400 hover:underline">
                                 Sign up
                             </Link>
                         </p>

@@ -79,19 +79,19 @@ export default function ProductCard({ p, onAdd }) {
       </Link>
 
       {/* Content area */}
-      <div className="flex flex-1 flex-col gap-1.5 p-2.5">
+      <div className="flex flex-1 flex-col gap-1.5 p-2">
 
         {/* Category & Brand */}
         {(p.category || p.brand) && (
-          <div className="flex items-center gap-1.5 text-[10px] text-text-muted">
+          <div className="flex items-center gap-1.5 text-[8px] sm:text-[10px] text-text-muted">
             {p.category && (
-              <span className="font-medium uppercase tracking-wide">
+              <span className="font-medium truncate">
                 {p.category}
               </span>
             )}
 
             {p.category && p.brand && (
-              <span className="text-text-muted/40">•</span>
+              <span className="text-text-muted/40 truncate">•</span>
             )}
 
             {p.brand && (
@@ -124,7 +124,7 @@ export default function ProductCard({ p, onAdd }) {
           {/* Rating */}
           <div className="flex items-center gap-1">
             <div className="flex items-center gap-0.5">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4].map((i) => (
                 <Star
                   key={i}
                   size={11}
@@ -158,7 +158,7 @@ export default function ProductCard({ p, onAdd }) {
 
           {/* Sold */}
           {p.sold > 0 && (
-            <span className="flex items-center gap-1 text-[11px] text-text-muted">
+            <span className="flex items-center gap-1 text-[8px] sm:text-[11px] text-text-muted">
               <Flame size={12} className="text-orange-400" />
               {formatSold(p.sold)} sold
             </span>

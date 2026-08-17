@@ -227,7 +227,7 @@ export default function Shop() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 xl:grid-cols-3">
+                            <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
                                 {list.map((p) => (
                                     <ProductCard key={p.id} p={p} onAdd={addToCart} />
                                 ))}

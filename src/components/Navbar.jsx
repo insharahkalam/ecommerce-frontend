@@ -12,7 +12,7 @@ import { AUTH_BASE_URL } from "../data/mockData";
 import { Logo } from "./Shared"
 
 const NAV_ITEMS = [
-    { to: "/home", label: "Home", end: true },
+    { to: "/", label: "Home", end: true },
     { to: "/shop", label: "Shop" },
     { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },

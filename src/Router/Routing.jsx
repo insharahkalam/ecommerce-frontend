@@ -36,7 +36,7 @@ const Routing = () => {
                     <Routes>
 
                         <Route element={<PublicLayout />}>
-                            <Route path='/home' element={<Home />} />
+                            <Route path='/' element={<Home />} />
                             <Route path='/product/:id' element={<ProductDetail />} />
                             <Route path='/cart' element={<Cart />} />
                             <Route path='/checkout' element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
@@ -47,7 +47,7 @@ const Routing = () => {
                         </Route>
 
                         {/* Auth routes — no header/layout needed */}
-                        <Route path='/' element={<Signup />} />
+                        <Route path='/signup' element={<Signup />} />
                         <Route path='/login' element={<Login />} />
                         <Route path='/forgot' element={<Forgot />} />
                         <Route path='/reset-password/:token' element={<ResetPass />} />
