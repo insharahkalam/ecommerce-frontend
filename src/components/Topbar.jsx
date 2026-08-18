@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, Bell, ChevronDown, LogOut, Package, AlertTriangle, UserPlus } from "lucide-react";
+import { Menu, Bell, ChevronDown, LogOut, Package, AlertTriangle, UserPlus, Sun, Moon } from "lucide-react";
 import toast from "react-hot-toast";
 import { pageTitles, AUTH_BASE_URL, NOTIFICATION_API_URL } from "../data/mockData";
 import api from "../config/axios";
 import pusherClient from "../config/pusher";
+import { useTheme } from "../context/ThemeContext"; // adjust path if different
 
 const TYPE_ICON = {
   order: Package,
@@ -19,7 +20,7 @@ export default function Topbar({ setMobileNavOpen, admin }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
-
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     function handleNotificationsRead(e) {
@@ -52,7 +53,7 @@ export default function Topbar({ setMobileNavOpen, admin }) {
     }
 
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000); // poll every 30s (fallback)
+    const interval = setInterval(fetchUnreadCount, 30000);
 
     return () => {
       cancelled = true;
@@ -72,7 +73,7 @@ export default function Topbar({ setMobileNavOpen, admin }) {
       toast.custom(
         (t) => (
           <div
-            className={`flex items-start gap-3 rounded-xl border border-orange-500/30 bg-neutral-950 px-4 py-3 shadow-lg transition cursor-pointer ${t.visible ? "opacity-100" : "opacity-0"
+            className={`flex items-start gap-3 rounded-xl border border-orange-500/30 bg-surface px-4 py-3 shadow-lg transition cursor-pointer ${t.visible ? "opacity-100" : "opacity-0"
               }`}
             onClick={() => {
               toast.dismiss(t.id);
@@ -81,8 +82,8 @@ export default function Topbar({ setMobileNavOpen, admin }) {
           >
             <Icon className="mt-0.5 h-5 w-5 shrink-0 text-orange-400" />
             <div>
-              <p className="text-sm font-medium text-white">{newNotif.title}</p>
-              <p className="text-xs text-neutral-400">{newNotif.message}</p>
+              <p className="text-sm font-medium text-text">{newNotif.title}</p>
+              <p className="text-xs text-text-muted">{newNotif.message}</p>
             </div>
           </div>
         ),
@@ -115,16 +116,25 @@ export default function Topbar({ setMobileNavOpen, admin }) {
   }
 
   return (
-    <header className="flex items-center justify-between gap-4 px-5 lg:px-8 py-4 border-b border-white/10 bg-neutral-950/70 backdrop-blur-xl">
+    <header className="flex items-center justify-between gap-4 px-5 lg:px-8 py-4 border-b border-border bg-bg/70 backdrop-blur-xl">
       <div className="flex items-center gap-3 flex-1">
         <button className="lg:hidden" onClick={() => setMobileNavOpen(true)}>
-          <Menu size={22} color="#fff" />
+          <Menu size={22} className="text-text" />
         </button>
-        <span className="hidden lg:block font-serif text-sm text-neutral-500">{title}</span>
+        <span className="hidden lg:block font-serif text-sm text-text-muted">{title}</span>
       </div>
       <div className="flex items-center gap-4">
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          className="relative w-9 h-9 rounded-lg flex items-center justify-center border border-border bg-hover hover:bg-orange-500/10 text-text-muted hover:text-orange-400 transition-colors"
+        >
+          {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+
         <button className="relative" onClick={() => navigate("/notifications")}>
-          <Bell size={19} color="#fff" />
+          <Bell size={19} className="text-text" />
           {unreadCount > 0 && (
             <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold leading-none text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
@@ -140,20 +150,23 @@ export default function Topbar({ setMobileNavOpen, admin }) {
             <div className="w-8 h-8 rounded-full flex items-center justify-center font-display text-sm font-semibold bg-gradient-to-br from-orange-500 to-orange-600 text-white">
               {initials}
             </div>
-            <span className="hidden sm:block text-sm font-serif capitalize text-white">{displayName}</span>
-            <ChevronDown size={14} color="#A3A3A3" className={`transition-transform ${menuOpen ? "rotate-180" : ""}`} />
+            <span className="hidden sm:block text-sm font-serif capitalize text-text">{displayName}</span>
+            <ChevronDown
+              size={14}
+              className={`text-text-muted transition-transform ${menuOpen ? "rotate-180" : ""}`}
+            />
           </div>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-44 rounded-lg border border-white/10 bg-neutral-900/95 backdrop-blur-xl shadow-xl shadow-black/40 py-1 z-50">
+            <div className="absolute right-0 mt-2 w-44 rounded-lg border border-border bg-surface/95 backdrop-blur-xl shadow-xl shadow-black/40 py-1 z-50">
               {admin?.email && (
-                <div className="px-3 py-2 border-b border-white/10">
-                  <p className="text-xs font-serif text-neutral-500 truncate">{admin.email}</p>
+                <div className="px-3 py-2 border-b border-border">
+                  <p className="text-xs font-serif text-text-muted truncate">{admin.email}</p>
                 </div>
               )}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm font-serif text-neutral-300 hover:bg-white/5 hover:text-red-400 transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm font-serif text-text-muted hover:bg-hover hover:text-red-400 transition-colors"
               >
                 <LogOut size={14} /> Logout
               </button>

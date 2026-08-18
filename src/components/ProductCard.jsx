@@ -79,7 +79,7 @@ export default function ProductCard({ p, onAdd }) {
       </Link>
 
       {/* Content area */}
-      <div className="flex flex-1 flex-col gap-1.5 p-2">
+      <div className="flex flex-1 flex-col gap-0.5 p-2">
 
         {/* Category & Brand */}
         {(p.category || p.brand) && (

@@ -5,6 +5,7 @@ import Topbar from "../../components/Topbar";
 import { API_BASE_URL, AUTH_BASE_URL, ORDERS_API_URL } from "../../data/mockData";
 import api from "../../config/axios";
 import pusherClient from "../../config/pusher";
+import { useTheme } from "../../context/ThemeContext";
 
 function normalizeCustomer(u) {
   return {
@@ -56,6 +57,7 @@ function normalizeOrder(o) {
 
 export default function AdminLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { theme } = useTheme();
 
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
@@ -133,7 +135,6 @@ export default function AdminLayout() {
       );
     });
 
-    // Naya order place hote hi real-time list mein aa jaye — bina refresh ke.
     channel.bind("new-order", (data) => {
       setOrders((prev) => {
         if (prev.some((o) => o.id === data._id)) return prev;
@@ -147,7 +148,6 @@ export default function AdminLayout() {
     };
   }, []);
 
-  // Real-time — naya signup hote hi Customers table turant update ho jaye
   useEffect(() => {
     const channel = pusherClient.subscribe("admin-customers");
 
@@ -165,23 +165,33 @@ export default function AdminLayout() {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full flex bg-neutral-950 text-white font-sans antialiased overflow-hidden">
+    <div className="relative min-h-screen w-full flex bg-bg text-text font-sans antialiased overflow-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
         .font-display { font-family: 'Fraunces', serif; }
         .font-serif { font-family: 'Source Serif 4', serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
         .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 9999px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-hover); border-radius: 9999px; }
         .nav-item { transition: background 0.15s ease, color 0.15s ease; }
       `}</style>
 
-      <div className="pointer-events-none fixed -top-40 -left-32 h-[28rem] w-[28rem] rounded-full bg-orange-500/20 blur-3xl" />
-      <div className="pointer-events-none fixed -bottom-40 -right-32 h-[28rem] w-[28rem] rounded-full bg-orange-600/10 blur-3xl" />
+      {/* Decorative glow — softer in light mode so it doesn't wash out white bg */}
+      <div
+        className={`pointer-events-none fixed -top-40 -left-32 h-[28rem] w-[28rem] rounded-full blur-3xl ${theme === "dark" ? "bg-orange-500/20" : "bg-orange-500/10"
+          }`}
+      />
+      <div
+        className={`pointer-events-none fixed -bottom-40 -right-32 h-[28rem] w-[28rem] rounded-full blur-3xl ${theme === "dark" ? "bg-orange-600/10" : "bg-orange-600/[0.06]"
+          }`}
+      />
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.12]"
         style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
+          backgroundImage:
+            theme === "dark"
+              ? "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)"
+              : "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0)",
           backgroundSize: "28px 28px",
         }}
       />

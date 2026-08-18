@@ -3,16 +3,17 @@ import { Bell, Package, AlertTriangle, UserPlus, Circle, BadgeCheck } from "luci
 import api from "../../config/axios";
 import pusherClient from "../../config/pusher";
 import { NOTIFICATION_API_URL } from "../../data/mockData";
+import { useTheme } from "../../context/ThemeContext";
 
 function GlowCard({ children, className = "" }) {
     return (
         <div
             className={
-                "relative rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-white/10 to-transparent shadow-2xl shadow-orange-500/10 " +
+                "relative rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-border to-transparent shadow-2xl shadow-orange-500/10 " +
                 className
             }
         >
-            <div className="relative overflow-hidden rounded-2xl bg-neutral-950/90 backdrop-blur-xl p-6">
+            <div className="relative overflow-hidden rounded-2xl bg-surface/90 backdrop-blur-xl p-6">
                 {children}
             </div>
         </div>
@@ -37,6 +38,7 @@ function timeAgo(dateStr) {
 export default function NotificationsPage() {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
 
     useEffect(() => {
         const fetchAll = async () => {
@@ -109,16 +111,18 @@ export default function NotificationsPage() {
     }, []);
 
     if (loading) {
-        return <div className="p-10 text-center text-neutral-400 font-serif">Loading notifications...</div>;
+        return <div className="p-10 text-center text-text-muted font-serif">Loading notifications...</div>;
     }
 
     return (
-        <div className="relative min-h-screen text-white font-sans antialiased">
+        <div className="relative min-h-screen text-text font-sans antialiased">
             <div
                 className="pointer-events-none fixed inset-0 z-0 opacity-[0.15]"
                 style={{
                     backgroundImage:
-                        "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
+                        theme === "dark"
+                            ? "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)"
+                            : "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0)",
                     backgroundSize: "28px 28px",
                 }}
             />
@@ -129,10 +133,10 @@ export default function NotificationsPage() {
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-500">
                             <BadgeCheck className="h-3.5 w-3.5" /> Admin console
                         </span>
-                        <h1 className="mt-3 font-serif italic text-3xl font-bold tracking-tight text-white">
+                        <h1 className="mt-3 font-serif italic text-3xl font-bold tracking-tight text-text">
                             Notifications
                         </h1>
-                        <p className="mt-1 text-sm text-neutral-400">
+                        <p className="mt-1 text-sm text-text-muted">
                             {unreadCount > 0
                                 ? `You have ${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}.`
                                 : "You're all caught up."}
@@ -146,14 +150,12 @@ export default function NotificationsPage() {
                 <GlowCard>
                     {notifications.length === 0 ? (
                         <div className="py-10 text-center">
-                            <Bell className="mx-auto h-8 w-8 text-neutral-700" />
-                            <p className="mt-3 text-sm text-neutral-400">Nothing to show here.</p>
+                            <Bell className="mx-auto h-8 w-8 text-text-muted opacity-50" />
+                            <p className="mt-3 text-sm text-text-muted">Nothing to show here.</p>
                         </div>
                     ) : (
-                        <ul className="divide-y divide-neutral-800">
+                        <ul className="divide-y divide-border">
                             {notifications.map((n) => {
-                                console.log(n, "notifi show");
-
                                 const meta = TYPE_META[n.type] || TYPE_META.order;
                                 const Icon = meta.icon;
                                 return (
@@ -161,18 +163,18 @@ export default function NotificationsPage() {
                                         <button
                                             type="button"
                                             onClick={() => markRead(n)}
-                                            className="flex w-full items-start gap-3 px-1 py-4 text-left transition hover:bg-neutral-900/40"
+                                            className="flex w-full items-start gap-3 px-1 py-4 text-left transition hover:bg-hover"
                                         >
                                             <div className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${meta.border} ${meta.bg} ${meta.color}`}>
                                                 <Icon className="h-4 w-4" />
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex items-center gap-2">
-                                                    <p className="truncate text-sm font-medium text-white">{n.title}</p>
+                                                    <p className="truncate text-sm font-medium text-text">{n.title}</p>
                                                     {!n.isRead && <Circle className="h-2 w-2 shrink-0 fill-orange-500 text-orange-500" />}
                                                 </div>
-                                                <p className="mt-0.5 text-xs text-neutral-300">{n.message}</p>
-                                                <p className="mt-1.5 text-[11px] text-neutral-500">{timeAgo(n.createdAt)}</p>
+                                                <p className="mt-0.5 text-xs text-text-muted">{n.message}</p>
+                                                <p className="mt-1.5 text-[11px] text-text-muted opacity-70">{timeAgo(n.createdAt)}</p>
                                             </div>
                                         </button>
                                     </li>

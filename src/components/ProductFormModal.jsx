@@ -140,7 +140,7 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         {toast && (
           <div className="fixed top-5 right-5 z-[999]">
-            <div className="flex items-center gap-2 px-4 py-3 rounded-lg border border-red-500/25 bg-red-500/10 text-red-300 shadow-xl shadow-black/40 text-sm font-serif backdrop-blur-xl">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg border border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-300 shadow-xl shadow-black/20 dark:shadow-black/40 text-sm font-serif backdrop-blur-xl">
               <XCircle size={16} />
               <span>{toast.message}</span>
             </div>
@@ -151,16 +151,16 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
         <div>
           <FieldLabel required={!editing}>Product image</FieldLabel>
           <label className="flex items-center gap-4 cursor-pointer">
-            <div className="w-20 h-20 rounded-xl flex-shrink-0 border border-white/10 bg-white/[0.04] overflow-hidden flex items-center justify-center">
+            <div className="w-20 h-20 rounded-xl flex-shrink-0 border border-[var(--color-border)] bg-[var(--color-hover)] overflow-hidden flex items-center justify-center">
               {imagePreview ? (
                 <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
-                <Upload size={20} color="#737373" />
+                <Upload size={20} className="text-[var(--color-text-muted)]" />
               )}
             </div>
             <div className="flex flex-col gap-1">
-              <span className="font-serif text-sm text-orange-400">Choose file…</span>
-              <span className="font-serif text-xs text-neutral-500">PNG or JPG, up to 5MB.</span>
+              <span className="font-serif text-sm text-orange-500 dark:text-orange-400">Choose file…</span>
+              <span className="font-serif text-xs text-[var(--color-text-muted)]">PNG or JPG, up to 5MB.</span>
             </div>
             <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
           </label>
@@ -203,19 +203,19 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
         </div>
 
         {/* Featured toggle */}
-        <div className="flex items-center justify-between gap-4 px-3 py-2.5 rounded-lg border border-white/10 bg-white/[0.03]">
+        <div className="flex items-center justify-between gap-4 px-3 py-2.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-hover)]">
           <div className="flex items-center gap-2">
             <Star size={14} color="#FBBF6B" />
             <div>
-              <p className="text-sm font-serif text-white">Featured product</p>
-              <p className="text-xs font-serif text-neutral-500">Show this product in featured collections.</p>
+              <p className="text-sm font-serif text-[var(--color-text)]">Featured product</p>
+              <p className="text-xs font-serif text-[var(--color-text-muted)]">Show this product in featured collections.</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setFeatured(!featured)}
             className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0"
-            style={{ background: featured ? "#F97316" : "rgba(255,255,255,0.12)" }}
+            style={{ background: featured ? "#F97316" : "var(--color-border)" }}
           >
             <span
               className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
@@ -228,30 +228,30 @@ export default function ProductFormModal({ editing, initial, onClose, onSaved })
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <FieldLabel>Specifications</FieldLabel>
-            <button type="button" onClick={addSpecRow} className="text-xs font-serif text-orange-400 hover:text-orange-300 flex items-center gap-1">
+            <button type="button" onClick={addSpecRow} className="text-xs font-serif text-orange-500 dark:text-orange-400 hover:text-orange-600 dark:hover:text-orange-300 flex items-center gap-1">
               <Plus size={12} /> Add spec
             </button>
           </div>
           <div className="flex flex-col gap-2">
             {specs.map((s, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 flex-1 px-2.5 py-2 rounded-lg border border-white/10 bg-white/[0.04]">
-                  <Tag size={12} color="#737373" />
+                <div className="flex items-center gap-1.5 flex-1 px-2.5 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-hover)]">
+                  <Tag size={12} className="text-[var(--color-text-muted)]" />
                   <input
                     value={s.key}
                     onChange={(e) => updateSpec(i, "key", e.target.value)}
                     placeholder="Material"
-                    className="bg-transparent outline-none text-xs font-serif text-white placeholder:text-neutral-600 w-full"
+                    className="bg-transparent outline-none text-xs font-serif text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] w-full"
                   />
                 </div>
                 <input
                   value={s.value}
                   onChange={(e) => updateSpec(i, "value", e.target.value)}
                   placeholder="100% cotton canvas"
-                  className="flex-1 px-2.5 py-2 rounded-lg border border-white/10 bg-white/[0.04] outline-none text-xs font-serif text-white placeholder:text-neutral-600"
+                  className="flex-1 px-2.5 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-hover)] outline-none text-xs font-serif text-[var(--color-text)] placeholder:text-[var(--color-text-muted)]"
                 />
                 {specs.length > 1 && (
-                  <button type="button" onClick={() => removeSpecRow(i)} className="p-1.5 text-neutral-500 hover:text-red-400 transition-colors">
+                  <button type="button" onClick={() => removeSpecRow(i)} className="p-1.5 text-[var(--color-text-muted)] hover:text-red-500 dark:hover:text-red-400 transition-colors">
                     <Trash2 size={14} />
                   </button>
                 )}

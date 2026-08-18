@@ -13,7 +13,6 @@ import api from "../../config/axios";
 const PAYMENT_STATUSES = ["Pending", "Paid", "Failed"];
 const MENU_WIDTH = 224; // w-56
 
-// Formats a number as Pakistani Rupees, e.g. Rs. 12,500
 const formatPKR = (amount) =>
   `Rs. ${Number(amount).toLocaleString("en-PK", {
     minimumFractionDigits: 0,
@@ -94,7 +93,6 @@ export default function Order() {
   }, [orders]);
 
   async function updateStatus(id, status) {
-    // Cancelling an order automatically restores stock on the backend — confirm first
     if (status === "Cancelled") {
       const confirmed = window.confirm(
         "Cancelling this order will automatically restore the stock for its items. Continue?"
@@ -118,7 +116,6 @@ export default function Order() {
       showToast("Could not update order — server unreachable.", "error");
     }
   }
-
 
   async function updatePaymentStatus(id, paymentStatus) {
     const prev = orders;
@@ -146,7 +143,7 @@ export default function Order() {
     }
   }
 
-  const th = "py-3 px-4 text-[11px] font-medium uppercase tracking-wider text-neutral-500";
+  const th = "py-3 px-4 text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-muted)]";
   const td = "py-3.5 px-4 align-middle";
 
   return (
@@ -154,10 +151,10 @@ export default function Order() {
       {/* Header */}
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-semibold tracking-tight text-white sm:text-2xl">
+          <h1 className="truncate text-xl font-semibold tracking-tight text-[var(--color-text)] sm:text-2xl">
             Orders
           </h1>
-          <p className="mt-1 text-sm text-neutral-400">
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
             {orders.length} total · {filtered.length} shown
           </p>
         </div>
@@ -169,7 +166,7 @@ export default function Order() {
           <SearchInput value={query} onChange={setQuery} placeholder="Search order ID or customer…" />
         </div>
         <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 pb-1 lg:overflow-visible lg:pb-0">
-          <Filter size={14} className="shrink-0 text-neutral-500" />
+          <Filter size={14} className="shrink-0 text-[var(--color-text-muted)]" />
           {["All", ...ORDER_STATUSES].map((s) => {
             const active = statusFilter === s;
             return (
@@ -177,8 +174,8 @@ export default function Order() {
                 key={s}
                 onClick={() => setStatusFilter(s)}
                 className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${active
-                  ? "border-orange-500/30 bg-orange-500/15 text-orange-300"
-                  : "border-white/10 text-neutral-400 hover:border-white/20 hover:text-neutral-200"
+                  ? "border-orange-500/30 bg-orange-500/15 text-orange-500 dark:text-orange-300"
+                  : "border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-orange-500/20 hover:text-[var(--color-text)]"
                   }`}
               >
                 {s}
@@ -200,17 +197,17 @@ export default function Order() {
                   <div className="min-w-0">
                     <button
                       onClick={() => setViewingOrder(o)}
-                      className="flex items-center gap-1.5 font-mono text-sm text-white transition-colors hover:text-orange-400"
+                      className="flex items-center gap-1.5 font-mono text-sm text-[var(--color-text)] transition-colors hover:text-orange-500 dark:hover:text-orange-400"
                     >
                       <Eye size={13} className="shrink-0" /> #{o.id.slice(-8)}
                     </button>
-                    <p className="mt-1 truncate text-sm text-neutral-300">{o.customer}</p>
-                    <p className="mt-0.5 font-mono text-xs text-neutral-500">{o.date}</p>
+                    <p className="mt-1 truncate text-sm text-[var(--color-text)]/80">{o.customer}</p>
+                    <p className="mt-0.5 font-mono text-xs text-[var(--color-text-muted)]">{o.date}</p>
                   </div>
                   <button
                     ref={(el) => (btnRefs.current[o.id] = el)}
                     onClick={() => toggleMenu(o.id)}
-                    className="shrink-0 rounded-md p-1.5 text-neutral-400 transition-colors hover:bg-white/5 hover:text-white"
+                    className="shrink-0 rounded-md p-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-text)]"
                     aria-label="Order actions"
                   >
                     <MoreHorizontal size={16} />
@@ -219,11 +216,11 @@ export default function Order() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill>
                   <Pill color={ps.color} bg={ps.bg} border={ps.border}>{o.paymentStatus}</Pill>
-                  <span className="text-xs text-neutral-500">{o.paymentMethod}</span>
+                  <span className="text-xs text-[var(--color-text-muted)]">{o.paymentMethod}</span>
                 </div>
-                <div className="flex items-center justify-between border-t border-white/10 pt-3">
-                  <span className="font-mono text-xs text-neutral-400">{o.items} items</span>
-                  <span className="font-mono text-base text-white">{formatPKR(o.total)}</span>
+                <div className="flex items-center justify-between border-t border-[var(--color-border)] pt-3">
+                  <span className="font-mono text-xs text-[var(--color-text-muted)]">{o.items} items</span>
+                  <span className="font-mono text-base text-[var(--color-text)]">{formatPKR(o.total)}</span>
                 </div>
               </div>
             </GlassCard>
@@ -231,7 +228,7 @@ export default function Order() {
         })}
         {filtered.length === 0 && (
           <GlassCard>
-            <p className="py-10 text-center text-sm text-neutral-500">No orders match your search.</p>
+            <p className="py-10 text-center text-sm text-[var(--color-text-muted)]">No orders match your search.</p>
           </GlassCard>
         )}
       </div>
@@ -242,7 +239,7 @@ export default function Order() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-left">
+                <tr className="border-b border-[var(--color-border)] text-left">
                   <th className={th}>Order</th>
                   <th className={th}>Customer</th>
                   <th className={th}>Items</th>
@@ -260,38 +257,38 @@ export default function Order() {
                   return (
                     <tr
                       key={o.id}
-                      className="border-b border-white/[0.06] transition-colors last:border-0 hover:bg-white/[0.03]"
+                      className="border-b border-[var(--color-border)] transition-colors last:border-0 hover:bg-[var(--color-hover)]"
                     >
-                      <td className={`${td} whitespace-nowrap font-mono text-white`}>
+                      <td className={`${td} whitespace-nowrap font-mono text-[var(--color-text)]`}>
                         <button
                           onClick={() => setViewingOrder(o)}
-                          className="flex items-center gap-1.5 transition-colors hover:text-orange-400"
+                          className="flex items-center gap-1.5 transition-colors hover:text-orange-500 dark:hover:text-orange-400"
                         >
                           <Eye size={12} /> {o.id.slice(-8)}
                         </button>
                       </td>
-                      <td className={`${td} max-w-[200px] truncate text-neutral-200`}>{o.customer}</td>
-                      <td className={`${td} font-mono text-neutral-400`}>{o.items}</td>
-                      <td className={`${td} whitespace-nowrap font-mono text-white`}>
+                      <td className={`${td} max-w-[200px] truncate text-[var(--color-text)]/85`}>{o.customer}</td>
+                      <td className={`${td} font-mono text-[var(--color-text-muted)]`}>{o.items}</td>
+                      <td className={`${td} whitespace-nowrap font-mono text-[var(--color-text)]`}>
                         {formatPKR(o.total)}
                       </td>
                       <td className={td}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
-                          <span className="text-xs text-neutral-400">{o.paymentMethod}</span>
+                          <span className="text-xs text-[var(--color-text-muted)]">{o.paymentMethod}</span>
                           <Pill color={ps.color} bg={ps.bg} border={ps.border}>{o.paymentStatus}</Pill>
                         </div>
                       </td>
                       <td className={`${td} whitespace-nowrap`}>
                         <Pill color={s.color} bg={s.bg} border={s.border}>{o.status}</Pill>
                       </td>
-                      <td className={`${td} whitespace-nowrap font-mono text-xs text-neutral-500`}>
+                      <td className={`${td} whitespace-nowrap font-mono text-xs text-[var(--color-text-muted)]`}>
                         {o.date}
                       </td>
                       <td className={`${td} text-right`}>
                         <button
                           ref={(el) => (btnRefs.current[o.id] = el)}
                           onClick={() => toggleMenu(o.id)}
-                          className="rounded-md p-1.5 text-neutral-400 transition-colors hover:bg-white/5 hover:text-white"
+                          className="rounded-md p-1.5 text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-text)]"
                           aria-label="Order actions"
                         >
                           <MoreHorizontal size={16} />
@@ -302,7 +299,7 @@ export default function Order() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-sm text-neutral-500">
+                    <td colSpan={8} className="py-12 text-center text-sm text-[var(--color-text-muted)]">
                       No orders match your search.
                     </td>
                   </tr>
@@ -318,10 +315,10 @@ export default function Order() {
         createPortal(
           <div
             ref={menuRef}
-            className="fixed z-[999] w-56 overflow-hidden rounded-xl border border-white/10 bg-neutral-900/95 shadow-2xl shadow-black/50 backdrop-blur-xl"
+            className="fixed z-[999] w-56 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]/95 shadow-2xl shadow-black/20 dark:shadow-black/50 backdrop-blur-xl"
             style={{ top: menuPos.top, left: menuPos.left }}
           >
-            <p className="px-3 pt-2.5 pb-1 text-[10px] uppercase tracking-wider text-neutral-500">
+            <p className="px-3 pt-2.5 pb-1 text-[10px] uppercase tracking-wider text-[var(--color-text-muted)]">
               Order status
             </p>
             {ORDER_STATUSES.map((s2) => {
@@ -330,14 +327,14 @@ export default function Order() {
                 <button
                   key={s2}
                   onClick={() => updateStatus(openMenuId, s2)}
-                  className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-neutral-300 transition-colors hover:bg-white/5 hover:text-white"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-text)]"
                 >
                   Mark {s2}
-                  {o?.status === s2 && <Check size={12} className="text-orange-400" />}
+                  {o?.status === s2 && <Check size={12} className="text-orange-500 dark:text-orange-400" />}
                 </button>
               );
             })}
-            <p className="border-t border-white/10 px-3 pt-2.5 pb-1 text-[10px] uppercase tracking-wider text-neutral-500">
+            <p className="border-t border-[var(--color-border)] px-3 pt-2.5 pb-1 text-[10px] uppercase tracking-wider text-[var(--color-text-muted)]">
               Payment status
             </p>
             {PAYMENT_STATUSES.map((p2) => {
@@ -346,16 +343,16 @@ export default function Order() {
                 <button
                   key={p2}
                   onClick={() => updatePaymentStatus(openMenuId, p2)}
-                  className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-neutral-300 transition-colors hover:bg-white/5 hover:text-white"
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-xs text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-text)]"
                 >
                   Mark {p2}
-                  {o?.paymentStatus === p2 && <Check size={12} className="text-orange-400" />}
+                  {o?.paymentStatus === p2 && <Check size={12} className="text-orange-500 dark:text-orange-400" />}
                 </button>
               );
             })}
             <button
               onClick={() => removeOrder(openMenuId)}
-              className="flex w-full items-center gap-1.5 border-t border-white/10 px-3 py-2.5 text-left text-xs text-red-400 transition-colors hover:bg-red-500/10"
+              className="flex w-full items-center gap-1.5 border-t border-[var(--color-border)] px-3 py-2.5 text-left text-xs text-[var(--color-danger)] transition-colors hover:bg-red-500/10"
             >
               <Trash2 size={12} /> Delete order
             </button>
@@ -372,14 +369,14 @@ export default function Order() {
             setReceiptZoom(false);
           }}
         >
-          <div className="flex max-h-[75vh] flex-col gap-4 ">
+          <div className="flex max-h-[75vh] flex-col gap-4">
             <section>
-              <p className="mb-2 text-[11px] uppercase tracking-wider text-neutral-500">Items</p>
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-[var(--color-text-muted)]">Items</p>
               <div className="flex flex-col gap-2">
                 {viewingOrder.rawItems.map((item, i) => (
                   <div
                     key={i}
-                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
+                    className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5"
                   >
                     <div className="flex min-w-0 items-center gap-2.5">
                       {item.image && (
@@ -390,13 +387,13 @@ export default function Order() {
                         />
                       )}
                       <div className="min-w-0">
-                        <p className="truncate text-sm text-white">{item.title}</p>
-                        <p className="font-mono text-xs text-neutral-500">
+                        <p className="truncate text-sm text-[var(--color-text)]">{item.title}</p>
+                        <p className="font-mono text-xs text-[var(--color-text-muted)]">
                           Qty {item.quantity} · {formatPKR(item.price)}
                         </p>
                       </div>
                     </div>
-                    <span className="shrink-0 font-mono text-sm text-white">
+                    <span className="shrink-0 font-mono text-sm text-[var(--color-text)]">
                       {formatPKR(item.price * item.quantity)}
                     </span>
                   </div>
@@ -406,28 +403,28 @@ export default function Order() {
 
             <section className="grid gap-4">
               <div>
-                <p className="mb-2 text-[11px] font-serif uppercase tracking-wider text-neutral-500">
+                <p className="mb-2 text-[11px] font-serif uppercase tracking-wider text-[var(--color-text-muted)]">
                   Shipping address
                 </p>
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 flex flex-col gap-1.5">
-                  <p className="font-mono text-xs text-neutral-500">
-                    Name: <span className="text-neutral-200">{viewingOrder.shippingAddress.fullName}</span>
+                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 flex flex-col gap-1.5">
+                  <p className="font-mono text-xs text-[var(--color-text-muted)]">
+                    Name: <span className="text-[var(--color-text)]/85">{viewingOrder.shippingAddress.fullName}</span>
                   </p>
-                  <p className="font-mono text-xs text-neutral-500">
-                    Contact: <span className="text-neutral-200">{viewingOrder.shippingAddress.phone}</span>
+                  <p className="font-mono text-xs text-[var(--color-text-muted)]">
+                    Contact: <span className="text-[var(--color-text)]/85">{viewingOrder.shippingAddress.phone}</span>
                   </p>
-                  <p className="font-mono text-xs text-neutral-500 leading-relaxed">
-                    Address: <span className="text-neutral-300 font-serif">{viewingOrder.shippingAddress.address}, {viewingOrder.shippingAddress.city}, {viewingOrder.shippingAddress.country}</span>
+                  <p className="font-mono text-xs text-[var(--color-text-muted)] leading-relaxed">
+                    Address: <span className="text-[var(--color-text)]/80 font-serif">{viewingOrder.shippingAddress.address}, {viewingOrder.shippingAddress.city}, {viewingOrder.shippingAddress.country}</span>
                   </p>
                 </div>
               </div>
 
               <div>
-                <p className="mb-2 text-[11px] uppercase tracking-wider text-neutral-500">Payment</p>
-                <div className="flex flex-col gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-neutral-300">
+                <p className="mb-2 text-[11px] uppercase tracking-wider text-[var(--color-text-muted)]">Payment</p>
+                <div className="flex flex-col gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2.5 text-sm text-[var(--color-text)]/85">
                   <div className="flex flex-wrap items-center gap-2">
                     <span>Method:</span>
-                    <span className="text-white">{viewingOrder.paymentMethod}</span>
+                    <span className="text-[var(--color-text)]">{viewingOrder.paymentMethod}</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span>Status:</span>
@@ -444,20 +441,20 @@ export default function Order() {
                     <>
                       <p className="break-all">
                         Transaction ID:{" "}
-                        <span className="font-mono text-white">
+                        <span className="font-mono text-[var(--color-text)]">
                           {viewingOrder.transferDetails.transactionId}
                         </span>
                       </p>
                       {viewingOrder.transferDetails.bankName && (
-                        <p>Bank: <span className="text-white">{viewingOrder.transferDetails.bankName}</span></p>
+                        <p>Bank: <span className="text-[var(--color-text)]">{viewingOrder.transferDetails.bankName}</span></p>
                       )}
                       {viewingOrder.transferDetails.accountTitle && (
-                        <p>Account Title: <span className="text-white">{viewingOrder.transferDetails.accountTitle}</span></p>
+                        <p>Account Title: <span className="text-[var(--color-text)]">{viewingOrder.transferDetails.accountTitle}</span></p>
                       )}
                       {viewingOrder.transferDetails.accountNumber && (
                         <p className="break-all">
                           Account No:{" "}
-                          <span className="font-mono text-white">
+                          <span className="font-mono text-[var(--color-text)]">
                             {viewingOrder.transferDetails.accountNumber}
                           </span>
                         </p>
@@ -471,7 +468,7 @@ export default function Order() {
             {(viewingOrder.paymentMethod === "Bank Transfer" ||
               viewingOrder.paymentMethod === "Easypaisa") && (
                 <section>
-                  <p className="mb-2 text-[11px] uppercase tracking-wider text-neutral-500">
+                  <p className="mb-2 text-[11px] uppercase tracking-wider text-[var(--color-text-muted)]">
                     Payment receipt
                   </p>
                   {viewingOrder.transferDetails?.receiptImage ? (
@@ -479,28 +476,28 @@ export default function Order() {
                       <button
                         type="button"
                         onClick={() => setReceiptZoom(true)}
-                        className="block w-full overflow-hidden rounded-xl border border-white/10 transition-colors hover:border-orange-500/40"
+                        className="block w-full overflow-hidden rounded-xl border border-[var(--color-border)] transition-colors hover:border-orange-500/40"
                       >
                         <img
                           src={viewingOrder.transferDetails.receiptImage}
                           alt="Payment receipt"
-                          className="max-h-56 w-full bg-black/30 object-contain sm:max-h-72"
+                          className="max-h-56 w-full bg-black/5 dark:bg-black/30 object-contain sm:max-h-72"
                         />
                       </button>
-                      <p className="mt-1.5 text-[11px] text-neutral-500">
+                      <p className="mt-1.5 text-[11px] text-[var(--color-text-muted)]">
                         Tap the receipt to view full size.
                       </p>
                       {viewingOrder.paymentStatus === "Pending" && (
                         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                           <button
                             onClick={() => updatePaymentStatus(viewingOrder.id, "Paid")}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2.5 text-xs font-medium text-green-300 transition-colors hover:bg-green-500/20"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2.5 text-xs font-medium text-green-600 dark:text-green-300 transition-colors hover:bg-green-500/20"
                           >
                             <Check size={12} /> Verify & mark Paid
                           </button>
                           <button
                             onClick={() => updatePaymentStatus(viewingOrder.id, "Failed")}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs font-medium text-red-300 transition-colors hover:bg-red-500/20"
+                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs font-medium text-red-600 dark:text-red-300 transition-colors hover:bg-red-500/20"
                           >
                             <X size={12} /> Reject
                           </button>
@@ -508,7 +505,7 @@ export default function Order() {
                       )}
                     </>
                   ) : (
-                    <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/10 px-3 py-6 text-xs text-neutral-500">
+                    <div className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--color-border)] px-3 py-6 text-xs text-[var(--color-text-muted)]">
                       <ImageOff size={14} /> No receipt uploaded
                     </div>
                   )}
@@ -516,8 +513,8 @@ export default function Order() {
               )}
 
             <div className="flex items-center justify-between rounded-xl border border-orange-500/25 bg-orange-500/10 px-4 py-3">
-              <span className="text-sm font-serif tracking-wide text-orange-300">Total Amount</span>
-              <span className="font-serif text-xl font-semibold text-white">
+              <span className="text-sm font-serif tracking-wide text-orange-600 dark:text-orange-300">Total Amount</span>
+              <span className="font-serif text-xl font-semibold text-[var(--color-text)]">
                 {formatPKR(viewingOrder.total)}
               </span>
             </div>
@@ -554,9 +551,9 @@ export default function Order() {
       {toast && (
         <div className="fixed inset-x-4 top-4 z-[999] sm:inset-x-auto sm:right-5 sm:top-5">
           <div
-            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm shadow-xl shadow-black/40 backdrop-blur-xl ${toast.type === "error"
-              ? "border-red-500/25 bg-red-500/15 text-red-300"
-              : "border-green-500/25 bg-green-500/15 text-green-300"
+            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm shadow-xl shadow-black/20 dark:shadow-black/40 backdrop-blur-xl ${toast.type === "error"
+              ? "border-red-500/25 bg-red-500/15 text-red-600 dark:text-red-300"
+              : "border-green-500/25 bg-green-500/15 text-green-600 dark:text-green-300"
               }`}
           >
             {toast.type === "error" ? <X size={16} className="shrink-0" /> : <Check size={16} className="shrink-0" />}

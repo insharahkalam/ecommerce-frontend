@@ -150,10 +150,34 @@ function SectionHeader({ eyebrow, title, sub }) {
   );
 }
 
-function ProductGrid({ loading, items, emptyMessage, onAdd }) {
+// function ProductGrid({ loading, items, emptyMessage, onAdd }) {
+//   if (loading) {
+//     return (
+//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+//         {Array.from({ length: 4 }).map((_, i) => (
+//           <ProductCardSkeleton key={i} />
+//         ))}
+//       </div>
+//     );
+//   }
+//   if (items.length === 0) {
+//     return <EmptyState message={emptyMessage} />;
+//   }
+//   return (
+//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+//       {items.map((p) => (
+//         <ProductCard key={p.id} p={p} onAdd={onAdd} />
+//       ))}
+//     </div>
+//   );
+// }
+
+
+
+function ProductGrid({ loading, items, emptyMessage, onAdd, layout = "grid" }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
         {Array.from({ length: 4 }).map((_, i) => (
           <ProductCardSkeleton key={i} />
         ))}
@@ -163,14 +187,30 @@ function ProductGrid({ loading, items, emptyMessage, onAdd }) {
   if (items.length === 0) {
     return <EmptyState message={emptyMessage} />;
   }
+
+  if (layout === "row") {
+    return (
+      <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-5">
+        {items.map((p) => (
+          <div
+            key={p.id}
+            className="shrink-0 w-[62vw] xs:w-64 sm:w-auto snap-start"
+          >
+            <ProductCard p={p} onAdd={onAdd} />
+          </div>
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
       {items.map((p) => (
         <ProductCard key={p.id} p={p} onAdd={onAdd} />
       ))}
     </div>
   );
 }
+
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -285,7 +325,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured */}
+      {/* Featured — single scrollable row on mobile */}
       <section aria-label="Featured products">
         <SectionHeader
           eyebrow="HANDPICKED"
@@ -297,6 +337,7 @@ export default function Home() {
           items={featured}
           emptyMessage="No featured products yet — check back soon."
           onAdd={addToCart}
+          layout="row"
         />
       </section>
 
@@ -345,7 +386,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Latest */}
+      {/* New Arrivals — 2 per row on mobile */}
       <section aria-label="New arrivals">
         <SectionHeader
           eyebrow="FRESH IN"
@@ -357,6 +398,7 @@ export default function Home() {
           items={latest}
           emptyMessage="No products yet — check back soon."
           onAdd={addToCart}
+          layout="grid"
         />
       </section>
 

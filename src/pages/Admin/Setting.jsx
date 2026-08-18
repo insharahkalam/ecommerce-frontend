@@ -7,11 +7,11 @@ function GlowCard({ children, className = "" }) {
   return (
     <div
       className={
-        "relative rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-white/10 to-transparent shadow-2xl shadow-orange-500/10 " +
+        "relative rounded-2xl p-[1px] bg-gradient-to-b from-orange-500/40 via-[var(--color-border)] to-transparent shadow-2xl shadow-orange-500/10 " +
         className
       }
     >
-      <div className="relative overflow-hidden rounded-2xl bg-neutral-950/90 backdrop-blur-xl p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-[var(--color-surface)]/90 backdrop-blur-xl p-6">
         {children}
       </div>
     </div>
@@ -25,8 +25,8 @@ function SectionHeader({ icon: Icon, title, desc }) {
         <Icon className="h-5 w-5" />
       </div>
       <div>
-        <h2 className="font-serif text-base font-semibold text-white">{title}</h2>
-        {desc && <p className="mt-0.5 text-sm text-neutral-400">{desc}</p>}
+        <h2 className="font-serif text-base font-semibold text-[var(--color-text)]">{title}</h2>
+        {desc && <p className="mt-0.5 text-sm text-[var(--color-text-muted)]">{desc}</p>}
       </div>
     </div>
   );
@@ -34,7 +34,7 @@ function SectionHeader({ icon: Icon, title, desc }) {
 
 function FieldLabel({ children, icon: Icon }) {
   return (
-    <label className="mb-2 flex items-center gap-1.5 text-xs font-medium tracking-wide text-neutral-400 uppercase">
+    <label className="mb-2 flex items-center gap-1.5 text-xs font-medium tracking-wide text-[var(--color-text-muted)] uppercase">
       {Icon && <Icon className="h-3.5 w-3.5 text-orange-500/70" />}
       {children}
     </label>
@@ -45,18 +45,18 @@ function TextField(props) {
   return (
     <input
       {...props}
-      className="w-full rounded-lg border border-neutral-800 bg-neutral-900/60 px-4 py-2.5 text-sm text-white tracking-wide outline-none transition placeholder:text-neutral-500 focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
+      className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)]/60 px-4 py-2.5 text-sm text-[var(--color-text)] tracking-wide outline-none transition placeholder:text-[var(--color-text-muted)] focus:border-orange-500/60 focus:ring-2 focus:ring-orange-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
     />
   );
 }
 
 function ToggleRow({ label, desc, value, onChange, disabled, dirty, saving, saved, onSave }) {
   return (
-    <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 px-4 py-3">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)]/40 px-4 py-3">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-white">{label}</p>
-          {desc && <p className="mt-0.5 text-xs text-neutral-400">{desc}</p>}
+          <p className="text-sm font-medium text-[var(--color-text)]">{label}</p>
+          {desc && <p className="mt-0.5 text-xs text-[var(--color-text-muted)]">{desc}</p>}
         </div>
         <button
           type="button"
@@ -64,7 +64,7 @@ function ToggleRow({ label, desc, value, onChange, disabled, dirty, saving, save
           onClick={() => onChange(!value)}
           className={
             "relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-40 " +
-            (value ? "bg-gradient-to-r from-orange-500 to-orange-600" : "bg-neutral-700")
+            (value ? "bg-gradient-to-r from-orange-500 to-orange-600" : "bg-[var(--color-border)]")
           }
         >
           <span
@@ -283,13 +283,14 @@ export default function Setting() {
   }
 
   return (
-    <div className="relative min-h-screen text-white font-sans antialiased">
+    <div className="relative min-h-screen text-[var(--color-text)] font-sans antialiased">
       <div
         className="pointer-events-none fixed inset-0 z-0 opacity-[0.15]"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
+            "radial-gradient(circle at 1px 1px, var(--color-text-muted) 1px, transparent 0)",
           backgroundSize: "28px 28px",
+          opacity: 0.15,
         }}
       />
 
@@ -298,10 +299,10 @@ export default function Setting() {
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-500">
             <BadgeCheck className="h-3.5 w-3.5" /> Admin console
           </span>
-          <h1 className="mt-3 font-serif italic text-3xl font-bold tracking-tight text-white">
+          <h1 className="mt-3 font-serif italic text-3xl font-bold tracking-tight text-[var(--color-text)]">
             Settings
           </h1>
-          <p className="mt-1 text-sm text-neutral-400">
+          <p className="mt-1 text-sm text-[var(--color-text-muted)]">
             Manage your admin account, security, and alert preferences.
           </p>
         </div>
@@ -311,12 +312,12 @@ export default function Setting() {
             <SectionHeader icon={User} title="Profile" desc="Your admin identity across the dashboard." />
 
             {profileError && (
-              <p className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              <p className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-500 dark:text-red-400">
                 {profileError}
               </p>
             )}
             {profileSuccess && (
-              <p className="mb-4 rounded-lg border border-orange-500/25 bg-orange-500/10 px-3 py-2 text-sm text-orange-400">
+              <p className="mb-4 rounded-lg border border-orange-500/25 bg-orange-500/10 px-3 py-2 text-sm text-orange-600 dark:text-orange-400">
                 {profileSuccess}
               </p>
             )}
@@ -355,13 +356,13 @@ export default function Setting() {
               </div>
             )}
 
-            <div className="mt-6 border-t border-neutral-800 pt-6">
+            <div className="mt-6 border-t border-[var(--color-border)] pt-6">
               <FieldLabel icon={Shield}>Role</FieldLabel>
               <div className="flex items-center justify-between rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3">
                 <span className="text-sm font-semibold text-orange-500">Admin</span>
                 <BadgeCheck className="h-4 w-4 text-orange-500" />
               </div>
-              <p className="mt-2 text-xs text-neutral-400">
+              <p className="mt-2 text-xs text-[var(--color-text-muted)]">
                 Full access to products, orders, and customers. Your access level is fixed.
               </p>
             </div>
@@ -401,12 +402,12 @@ export default function Setting() {
               </div>
 
               {passwordError && (
-                <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-500 dark:text-red-400">
                   {passwordError}
                 </p>
               )}
               {passwordSuccess && (
-                <p className="rounded-lg border border-orange-500/25 bg-orange-500/10 px-3 py-2 text-sm text-orange-400">
+                <p className="rounded-lg border border-orange-500/25 bg-orange-500/10 px-3 py-2 text-sm text-orange-600 dark:text-orange-400">
                   {passwordSuccess}
                 </p>
               )}
@@ -428,12 +429,12 @@ export default function Setting() {
             <SectionHeader icon={Bell} title="Notifications" desc="Choose what we alert you about. Each toggle saves on its own." />
 
             {loadError && (
-              <p className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              <p className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-500 dark:text-red-400">
                 {loadError}
               </p>
             )}
             {saveError && (
-              <p className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              <p className="mb-4 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-500 dark:text-red-400">
                 {saveError}
               </p>
             )}
@@ -474,7 +475,7 @@ export default function Setting() {
               />
             </div>
 
-            <p className="mt-4 text-xs text-neutral-500">
+            <p className="mt-4 text-xs text-[var(--color-text-muted)]">
               Turning a toggle off won't stop that notification from being recorded (your unread
               count still goes up) — it just won't pop up as a toast.
             </p>

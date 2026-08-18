@@ -20,16 +20,16 @@ export default function Sidebar({ mobileNavOpen, setMobileNavOpen }) {
   return (
     <>
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 flex flex-col border-r border-white/10 bg-neutral-950/80 backdrop-blur-xl transition-transform duration-200 ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 flex flex-col border-r border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-xl transition-transform duration-200 ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
       >
         <div className="flex items-center justify-between px-6 py-6">
           <Link to="/adminDashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-semibold bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/20">
               <IoMdAppstore />
             </div>
-            <span className="font-display italic text-lg font-semibold tracking-tight">ApnaBazar</span>
+            <span className="font-display italic text-lg font-semibold tracking-tight text-[var(--color-text)]">ApnaBazar</span>
           </Link>
-          <button className="lg:hidden" onClick={() => setMobileNavOpen(false)}>
+          <button className="lg:hidden text-[var(--color-text)]" onClick={() => setMobileNavOpen(false)}>
             <X size={20} />
           </button>
         </div>
@@ -48,7 +48,7 @@ export default function Sidebar({ mobileNavOpen, setMobileNavOpen }) {
                 className="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-serif text-left"
                 style={({ isActive }) => ({
                   background: isActive ? "rgba(249,115,22,0.12)" : "transparent",
-                  color: isActive ? "#FB923C" : "#A3A3A3",
+                  color: isActive ? "#FB923C" : "var(--color-text-muted)",
                 })}
               >
                 {item.label}
@@ -57,9 +57,9 @@ export default function Sidebar({ mobileNavOpen, setMobileNavOpen }) {
           })}
         </nav>
 
-        <div className="px-4 py-5 mx-3 mb-4 rounded-xl border border-white/10 bg-white/[0.03]">
-          <p className="text-xs text-neutral-500 font-serif">Store status</p>
-          <p className="font-mono text-sm mt-1 text-orange-400">● All systems normal</p>
+        <div className="px-4 py-5 mx-3 mb-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-hover)]">
+          <p className="text-xs text-[var(--color-text-muted)] font-serif">Store status</p>
+          <p className="font-mono text-sm mt-1 text-orange-500 dark:text-orange-400">● All systems normal</p>
         </div>
       </aside>
 
