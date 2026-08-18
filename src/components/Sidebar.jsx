@@ -6,6 +6,7 @@ import {
 import { IoMdAppstore } from "react-icons/io";
 import api from "../config/axios";
 import pusherClient from "../config/pusher";
+import logo from "../assets/logo.png"
 
 const navItems = [
   { path: "/adminDashboard", label: "Dashboard", icon: LayoutGrid },
@@ -24,10 +25,26 @@ export default function Sidebar({ mobileNavOpen, setMobileNavOpen }) {
       >
         <div className="flex items-center justify-between px-6 py-6">
           <Link to="/adminDashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-semibold bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/20">
-              <IoMdAppstore />
-            </div>
-            <span className="font-display italic text-lg font-semibold tracking-tight text-[var(--color-text)]">ApnaBazar</span>
+            <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-gradient-to-r from-orange-400 to-amber-300 p-[2px] ">
+              <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-[8px] bg-white">
+                <img
+                  src={logo}
+                  alt="UrbanTraders"
+                  width={40}
+                  height={40}
+                  className="h-11 w-11 object-contain"
+                />
+              </span>
+            </span>
+
+            <span className="flex flex-col leading-none">
+              <span className="font-serif text-[19px] font-extrabold tracking-[-0.03em] text-neutral-900 dark:text-white">
+                Urban<span className="bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">Traders</span>
+              </span>
+              <span className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[0.28em] text-neutral-400 dark:text-neutral-500 sm:block">
+                Shop Smart
+              </span>
+            </span>
           </Link>
           <button className="lg:hidden text-[var(--color-text)]" onClick={() => setMobileNavOpen(false)}>
             <X size={20} />

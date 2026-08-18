@@ -150,30 +150,6 @@ function SectionHeader({ eyebrow, title, sub }) {
   );
 }
 
-// function ProductGrid({ loading, items, emptyMessage, onAdd }) {
-//   if (loading) {
-//     return (
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-//         {Array.from({ length: 4 }).map((_, i) => (
-//           <ProductCardSkeleton key={i} />
-//         ))}
-//       </div>
-//     );
-//   }
-//   if (items.length === 0) {
-//     return <EmptyState message={emptyMessage} />;
-//   }
-//   return (
-//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-//       {items.map((p) => (
-//         <ProductCard key={p.id} p={p} onAdd={onAdd} />
-//       ))}
-//     </div>
-//   );
-// }
-
-
-
 function ProductGrid({ loading, items, emptyMessage, onAdd, layout = "grid" }) {
   if (loading) {
     return (
@@ -190,7 +166,7 @@ function ProductGrid({ loading, items, emptyMessage, onAdd, layout = "grid" }) {
 
   if (layout === "row") {
     return (
-      <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-5">
+      <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 py-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-5">
         {items.map((p) => (
           <div
             key={p.id}

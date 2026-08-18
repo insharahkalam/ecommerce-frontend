@@ -121,7 +121,7 @@ export default function Topbar({ setMobileNavOpen, admin }) {
         <button className="lg:hidden" onClick={() => setMobileNavOpen(true)}>
           <Menu size={22} className="text-text" />
         </button>
-        <span className="hidden lg:block font-serif text-sm text-text-muted">{title}</span>
+        <span className="hidden lg:block font-serif text-lg font-bold uppercase tracking-wide">{title}</span>
       </div>
       <div className="flex items-center gap-4">
         {/* Theme toggle */}
